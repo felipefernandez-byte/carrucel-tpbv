@@ -1,0 +1,873 @@
+/* ==========================================================
+   TPBV MÓVIL v5.1
+   ========================================================== */
+
+.detail-page.mobile-v32 {
+
+    --wine: #773357;
+    --wine-hover: #8C3E66;
+    --green: #3D4A39;
+
+    --bg: #F5F4F2;
+
+    --border: #E4E1DA;
+
+    --muted: #72776F;
+
+    background: var(--bg);
+}
+
+
+/* ==========================================================
+   CONTENEDOR
+   ========================================================== */
+
+.detail-page.mobile-v32 .detail-shell {
+
+    max-width: 760px;
+
+    margin: 0 auto;
+
+    padding:
+
+        0
+        16px
+        calc(
+            94px +
+            env(safe-area-inset-bottom)
+        );
+}
+
+
+/* ==========================================================
+   BOTÓN PRINCIPAL DESCARGAR FOTO
+   ========================================================== */
+
+.detail-page .download-main-btn {
+
+    display: flex !important;
+
+    visibility: visible !important;
+
+    opacity: 1 !important;
+
+
+    width: 100%;
+
+    min-height: 52px;
+
+
+    align-items: center;
+
+    justify-content: center;
+
+
+    gap: 10px;
+
+
+    padding:
+
+        13px
+        18px;
+
+
+    border: 0;
+
+    border-radius: 14px;
+
+
+    background:
+
+        var(--wine)
+
+        !important;
+
+
+    color:
+
+        #FFFFFF
+
+        !important;
+
+
+    text-decoration:
+
+        none
+
+        !important;
+
+
+    font-weight: 800;
+
+
+    box-shadow:
+
+        0
+        7px
+        18px
+        rgba(
+            119,
+            51,
+            87,
+            .17
+        );
+}
+
+
+.detail-page .download-main-btn:hover,
+
+.detail-page .download-main-btn:focus-visible {
+
+    background:
+
+        var(--wine-hover)
+
+        !important;
+
+
+    color:
+
+        #FFFFFF
+
+        !important;
+
+
+    outline: none;
+}
+
+
+.detail-page .download-main-btn svg {
+
+    width: 21px;
+
+    height: 21px;
+
+    flex: 0 0 auto;
+}
+
+
+/* ==========================================================
+   TEXTO GALERÍA
+   ========================================================== */
+
+.gallery-scope-help {
+
+    margin:
+
+        10px
+        0
+        14px;
+
+
+    color:
+
+        var(--muted);
+
+
+    font-size: 13px;
+
+    line-height: 1.45;
+}
+
+
+/* ==========================================================
+   BOTONES DE DESCARGA GENERAL
+   ========================================================== */
+
+.gallery-main-actions {
+
+    display: grid;
+
+    grid-template-columns:
+
+        1fr;
+
+
+    gap: 9px;
+
+
+    margin-bottom: 12px;
+}
+
+
+.gallery-action-primary,
+
+.gallery-action-secondary {
+
+    min-height: 48px;
+
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+
+    gap: 9px;
+
+
+    padding:
+
+        10px
+        14px;
+
+
+    border-radius: 13px;
+
+
+    font-weight: 800;
+
+
+    cursor: pointer;
+}
+
+
+.gallery-action-primary {
+
+    border: 0;
+
+
+    background:
+
+        var(--green);
+
+
+    color:
+
+        #FFFFFF;
+}
+
+
+.gallery-action-secondary {
+
+    border:
+
+        1px solid
+        rgba(
+            119,
+            51,
+            87,
+            .28
+        );
+
+
+    background:
+
+        #FFFFFF;
+
+
+    color:
+
+        var(--wine);
+}
+
+
+.gallery-action-secondary:disabled {
+
+    opacity: .42;
+
+    cursor: not-allowed;
+}
+
+
+.gallery-action-primary svg,
+
+.gallery-action-secondary svg {
+
+    width: 19px;
+
+    height: 19px;
+}
+
+
+/* ==========================================================
+   GALERÍA
+   ========================================================== */
+
+.mobile-v32 .gallery {
+
+    display: grid;
+
+
+    grid-template-columns:
+
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+
+    gap: 10px;
+}
+
+
+/* ==========================================================
+   TARJETA
+   TODA LA TARJETA ES SELECCIONABLE
+   ========================================================== */
+
+.mobile-v32 .gallery-card {
+
+    position: relative;
+
+
+    overflow: hidden;
+
+
+    border:
+
+        1px solid
+        var(--border);
+
+
+    border-radius: 16px;
+
+
+    background:
+
+        #FFFFFF;
+
+
+    cursor: pointer;
+
+
+    user-select: none;
+
+
+    -webkit-tap-highlight-color:
+
+        transparent;
+
+
+    transition:
+
+        transform .16s ease,
+
+        border-color .16s ease,
+
+        box-shadow .16s ease;
+}
+
+
+.mobile-v32 .gallery-card:active {
+
+    transform:
+
+        scale(.985);
+}
+
+
+/* ==========================================================
+   FOTO SELECCIONADA
+   ========================================================== */
+
+.mobile-v32 .gallery-card.selected {
+
+    border-color:
+
+        var(--wine);
+
+
+    outline:
+
+        3px solid
+        rgba(
+            119,
+            51,
+            87,
+            .23
+        );
+
+
+    outline-offset:
+
+        -3px;
+
+
+    box-shadow:
+
+        0
+        8px
+        20px
+        rgba(
+            119,
+            51,
+            87,
+            .13
+        );
+}
+
+
+.mobile-v32 .gallery-card img {
+
+    display: block;
+
+
+    width: 100%;
+
+
+    aspect-ratio:
+
+        1 / 1;
+
+
+    object-fit:
+
+        cover;
+
+
+    background:
+
+        #E9E7E1;
+}
+
+
+.mobile-v32 .gallery-card.selected img {
+
+    filter:
+
+        brightness(.86);
+}
+
+
+/* ==========================================================
+   CHECK ARRIBA A LA DERECHA
+   AHORA ES SOLO INDICADOR
+   ========================================================== */
+
+.mobile-v32 .select-photo {
+
+    position: absolute;
+
+
+    z-index: 5;
+
+
+    top: 8px;
+
+    right: 8px;
+
+
+    width: 32px;
+
+    height: 32px;
+
+
+    display: grid;
+
+    place-items: center;
+
+
+    border:
+
+        2px solid
+        rgba(
+            255,
+            255,
+            255,
+            .94
+        );
+
+
+    border-radius:
+
+        50%;
+
+
+    background:
+
+        rgba(
+            255,
+            255,
+            255,
+            .92
+        );
+
+
+    color:
+
+        #B0B4AE;
+
+
+    box-shadow:
+
+        0
+        3px
+        10px
+        rgba(
+            0,
+            0,
+            0,
+            .16
+        );
+
+
+    /*
+     * MUY IMPORTANTE:
+     *
+     * ya no recibe clics.
+     * Toda la foto es seleccionable.
+     */
+
+    pointer-events:
+
+        none;
+}
+
+
+.mobile-v32
+.gallery-card.selected
+.select-photo {
+
+    background:
+
+        var(--wine);
+
+
+    color:
+
+        #FFFFFF;
+}
+
+
+.mobile-v32 .select-photo span {
+
+    font-size: 15px;
+
+    font-weight: 900;
+}
+
+
+/* ==========================================================
+   PIE DE CADA FOTO
+   ========================================================== */
+
+.gallery-card-body {
+
+    min-height: 56px;
+
+
+    display: grid;
+
+
+    grid-template-columns:
+
+        minmax(
+            0,
+            1fr
+        )
+
+        auto;
+
+
+    gap: 7px;
+
+
+    align-items: center;
+
+
+    padding:
+
+        8px
+        8px
+        9px
+        10px;
+}
+
+
+.gallery-card-body strong {
+
+    overflow: hidden;
+
+
+    color:
+
+        #353934;
+
+
+    font-size:
+
+        11px;
+
+
+    line-height:
+
+        1.25;
+
+
+    white-space:
+
+        nowrap;
+
+
+    text-overflow:
+
+        ellipsis;
+}
+
+
+/* ==========================================================
+   DESCARGAR CADA FOTO
+   ========================================================== */
+
+.gallery-download {
+
+    min-width:
+
+        40px
+
+        !important;
+
+
+    height:
+
+        36px;
+
+
+    display:
+
+        flex
+
+        !important;
+
+
+    align-items:
+
+        center;
+
+
+    justify-content:
+
+        center;
+
+
+    gap:
+
+        5px;
+
+
+    padding:
+
+        0
+        9px;
+
+
+    border:
+
+        1px solid
+        rgba(
+            119,
+            51,
+            87,
+            .18
+        );
+
+
+    border-radius:
+
+        9px;
+
+
+    background:
+
+        #F4EDF1
+
+        !important;
+
+
+    color:
+
+        var(--wine)
+
+        !important;
+
+
+    text-decoration:
+
+        none
+
+        !important;
+
+
+    font-size:
+
+        10px;
+
+
+    font-weight:
+
+        800;
+
+
+    cursor:
+
+        pointer;
+}
+
+
+.gallery-download svg {
+
+    width:
+
+        16px;
+
+
+    height:
+
+        16px;
+}
+
+
+.gallery-download:hover,
+
+.gallery-download:focus-visible {
+
+    background:
+
+        var(--wine)
+
+        !important;
+
+
+    color:
+
+        #FFFFFF
+
+        !important;
+
+
+    outline:
+
+        none;
+}
+
+
+/* ==========================================================
+   CARGAR MÁS
+   ========================================================== */
+
+.load-more-btn {
+
+    width:
+
+        100%;
+
+
+    min-height:
+
+        46px;
+
+
+    margin-top:
+
+        12px;
+
+
+    border:
+
+        1px solid
+        var(--border);
+
+
+    border-radius:
+
+        12px;
+
+
+    background:
+
+        #FFFFFF;
+
+
+    color:
+
+        var(--green);
+
+
+    font-weight:
+
+        800;
+
+
+    cursor:
+
+        pointer;
+}
+
+
+/* ==========================================================
+   BARRA DE SELECCIONADOS
+   ========================================================== */
+
+.selection-dock button {
+
+    background:
+
+        var(--wine)
+
+        !important;
+
+
+    color:
+
+        #FFFFFF
+
+        !important;
+}
+
+
+/* ==========================================================
+   MENSAJES DE DESCARGA
+   ========================================================== */
+
+.mobile-v32 .download-status {
+
+    max-height:
+
+        calc(
+            100vh -
+            30px
+        );
+
+
+    overflow:
+
+        auto;
+}
+
+
+/* ==========================================================
+   TABLET
+   ========================================================== */
+
+@media (
+    min-width:
+        600px
+) {
+
+    .gallery-main-actions {
+
+        grid-template-columns:
+
+            1fr
+            1fr;
+    }
+
+
+    .mobile-v32 .gallery {
+
+        grid-template-columns:
+
+            repeat(
+                3,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+}

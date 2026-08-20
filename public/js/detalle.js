@@ -1,99 +1,146 @@
-const $ = id =>
-  document.getElementById(id);
+const $ =
+  id =>
+    document.getElementById(
+      id
+    );
 
-let current = null;
 
-let visibleGalleryPhotos = [];
+/* ==========================================================
+   ESTADO
+   ========================================================== */
 
-let filteredGalleryPhotos = [];
+let current =
+  null;
+
+
+let visibleGalleryPhotos =
+  [];
+
+
+let filteredGalleryPhotos =
+  [];
+
+
+let activeGalleryParams =
+  null;
+
+
+let activeGalleryTitle =
+  "";
+
+
+let renderLimit =
+  120;
+
 
 const selectedPhotoIds =
   new Set();
+
 
 /* ==========================================================
    UTILIDADES
    ========================================================== */
 
-function splitPipe(value) {
-  return String(value || "")
-    .split("|")
-    .map(v => v.trim())
-    .filter(Boolean);
+function splitPipe(
+  value
+) {
+
+  return String(
+    value ||
+    ""
+  )
+
+    .split(
+      "|"
+    )
+
+    .map(
+      value =>
+        value.trim()
+    )
+
+    .filter(
+      Boolean
+    );
 }
 
-/*
- * Obtiene el FOTO_ID.
- *
- * NUEVA FORMA:
- *
- * /detalle.html?foto=FOTO-XXXXX
- *
- * También dejamos soporte para:
- *
- * /foto/FOTO-XXXXX
- *
- * por compatibilidad.
- */
+
+/* ==========================================================
+   FOTO ID DEL QR
+   ========================================================== */
+
 function photoIdFromPath() {
 
-  /* ==============================
-     1. BUSCAR EN QUERY STRING
-     ============================== */
+  /*
+   * FORMA ACTUAL:
+   *
+   * /detalle.html?foto=FOTO-XXXXX
+   */
 
-  const params =
+  const queryId =
     new URLSearchParams(
-      window.location.search
+      location.search
+    )
+    .get(
+      "foto"
     );
 
-  const fotoQuery =
-    params.get("foto");
 
   if (
-    fotoQuery &&
-    fotoQuery.trim() !== ""
+    queryId?.trim()
   ) {
-    return fotoQuery.trim();
+
+    return queryId.trim();
   }
 
 
-  /* ==============================
-     2. COMPATIBILIDAD CON /foto/
-     ============================== */
+  /*
+   * Compatibilidad con:
+   *
+   * /foto/FOTO-XXXXX
+   */
 
   const parts =
-    window.location.pathname
-      .split("/")
-      .filter(Boolean);
+    location.pathname
+
+      .split(
+        "/"
+      )
+
+      .filter(
+        Boolean
+      );
+
 
   if (
-    parts[0] === "foto" &&
+    parts[0] ===
+      "foto"
+    &&
     parts[1]
   ) {
+
     return decodeURIComponent(
       parts[1]
     );
   }
 
 
-  /* ==============================
-     3. NO ENCONTRADO
-     ============================== */
-
   return null;
 }
 
 
-function imageUrl(photo) {
+/* ==========================================================
+   URL IMAGEN
+   ========================================================== */
 
-  if (
-    !photo ||
-    !photo.foto_id
-  ) {
-    return "";
-  }
+function imageUrl(
+  photo
+) {
 
   return (
+
     `/api/image?foto_id=` +
+
     encodeURIComponent(
       photo.foto_id
     )
@@ -101,17 +148,18 @@ function imageUrl(photo) {
 }
 
 
-function downloadUrl(photo) {
+/* ==========================================================
+   URL DESCARGA ORIGINAL
+   ========================================================== */
 
-  if (
-    !photo ||
-    !photo.foto_id
-  ) {
-    return "#";
-  }
+function downloadUrl(
+  photo
+) {
 
   return (
+
     `/api/download?foto_id=` +
+
     encodeURIComponent(
       photo.foto_id
     )
@@ -119,129 +167,219 @@ function downloadUrl(photo) {
 }
 
 
-async function fetchJson(url) {
+/* ==========================================================
+   FETCH JSON
+   ========================================================== */
+
+async function fetchJson(
+  url
+) {
 
   const response =
     await fetch(
+
       url,
+
       {
-        cache: "no-store"
+        cache:
+          "no-store"
       }
     );
 
-  if (!response.ok) {
 
-    const data =
+  if (
+    !response.ok
+  ) {
+
+    const body =
       await response
+
         .json()
-        .catch(() => ({}));
+
+        .catch(
+          () => ({})
+        );
+
 
     throw new Error(
-      data.error ||
+
+      body.error
+
+      ||
+
       `HTTP ${response.status}`
     );
   }
+
 
   return response.json();
 }
 
 
 /* ==========================================================
-   INFORMACIÓN DE LA FOTO
+   PROMOTOR / COORDINADOR
    ========================================================== */
 
-function roleLabel(photo) {
+function roleLabel(
+  photo
+) {
 
-  const tipo =
+  const type =
     String(
-      photo?.tipo_reporte || ""
+      photo?.tipo_reporte ||
+      ""
     )
+
       .trim()
+
       .toLowerCase();
 
-  if (
-    tipo === "coordinador"
-  ) {
-    return "Coordinador";
-  }
 
-  return "Promotor";
+  return (
+    type ===
+    "coordinador"
+  )
+
+    ?
+
+    "Coordinador"
+
+    :
+
+    "Promotor";
 }
 
 
-function municipalityOf(photo) {
+/* ==========================================================
+   MUNICIPIO
+   ========================================================== */
 
-  if (!photo) {
-    return "";
-  }
+function municipalityOf(
+  photo
+) {
 
   const own =
     String(
-      photo.municipio || ""
-    ).trim();
+      photo?.municipio ||
+      ""
+    )
+    .trim();
+
 
   if (own) {
+
     return own;
   }
 
+
   const values =
     splitPipe(
-      photo.municipios_relacionados
+      photo?.municipios_relacionados
     );
 
-  if (
-    values.length === 1
-  ) {
-    return values[0];
-  }
 
-  return "";
+  return (
+    values.length ===
+    1
+  )
+
+    ?
+
+    values[0]
+
+    :
+
+    "";
 }
 
 
-function primaryPlace(photo) {
+/* ==========================================================
+   LUGAR PRINCIPAL
+   ========================================================== */
 
-  if (!photo) {
-    return "Territorio TPBV";
-  }
+function primaryPlace(
+  photo
+) {
 
   if (
-    photo.tipo_asociacion ===
-      "EXACTA" &&
-    photo.localidad
+
+    photo?.tipo_asociacion ===
+      "EXACTA"
+
+    &&
+
+    photo?.localidad
+
   ) {
+
     return photo.localidad;
   }
 
+
   return (
-    municipalityOf(photo) ||
+
+    municipalityOf(
+      photo
+    )
+
+    ||
+
     "Territorio TPBV"
   );
 }
 
 
-function uniqueSorted(values) {
+/* ==========================================================
+   ORDENAR SIN REPETIDOS
+   ========================================================== */
+
+function uniqueSorted(
+  values
+) {
 
   return [
+
     ...new Set(
+
       values
+
         .map(
+
           value =>
-            String(value || "")
+
+            String(
+              value ||
+              ""
+            )
+
               .trim()
         )
-        .filter(Boolean)
+
+        .filter(
+          Boolean
+        )
     )
-  ].sort(
-    (a, b) =>
-      a.localeCompare(
-        b,
-        "es",
-        {
-          sensitivity: "base"
-        }
-      )
-  );
+  ]
+
+    .sort(
+
+      (
+        a,
+        b
+      ) =>
+
+        a.localeCompare(
+
+          b,
+
+          "es",
+
+          {
+            sensitivity:
+              "base"
+          }
+        )
+    );
 }
 
 
@@ -249,37 +387,55 @@ function uniqueSorted(values) {
    MENSAJES
    ========================================================== */
 
-function setStatus(message) {
+function setStatus(
+  message,
+  persistent = false
+) {
 
   const element =
     $("downloadStatus");
 
+
   if (!element) {
+
     return;
   }
+
 
   element.textContent =
     message;
 
-  element.classList.remove(
-    "hidden"
-  );
+
+  element
+    .classList
+    .remove(
+      "hidden"
+    );
+
 
   clearTimeout(
     setStatus.timer
   );
 
-  setStatus.timer =
-    setTimeout(
-      () => {
 
-        element.classList.add(
-          "hidden"
-        );
+  if (
+    !persistent
+  ) {
 
-      },
-      3800
-    );
+    setStatus.timer =
+      setTimeout(
+
+        () =>
+
+          element
+            .classList
+            .add(
+              "hidden"
+            ),
+
+        4500
+      );
+  }
 }
 
 
@@ -287,280 +443,438 @@ function setStatus(message) {
    FOTO PRINCIPAL
    ========================================================== */
 
-function setMainImage(photo) {
+function setMainImage(
+  photo
+) {
 
   const img =
     $("selectedPhoto");
 
+
   const skeleton =
     $("selectedSkeleton");
 
-  if (
-    !img ||
-    !skeleton
-  ) {
-    return;
-  }
 
-  img.classList.remove(
-    "loaded"
-  );
+  img
+    .classList
+    .remove(
+      "loaded"
+    );
 
-  skeleton.classList.remove(
-    "hidden"
-  );
+
+  skeleton
+    .classList
+    .remove(
+      "hidden"
+    );
+
 
   img.onload =
     () => {
 
-      img.classList.add(
-        "loaded"
-      );
+      img
+        .classList
+        .add(
+          "loaded"
+        );
 
-      skeleton.classList.add(
-        "hidden"
-      );
 
+      skeleton
+        .classList
+        .add(
+          "hidden"
+        );
     };
 
 
   img.onerror =
     () => {
 
-      skeleton.classList.add(
-        "hidden"
-      );
+      skeleton
+        .classList
+        .add(
+          "hidden"
+        );
+
 
       setStatus(
-        "No fue posible cargar la fotografía. Intenta nuevamente."
+        "No fue posible cargar la fotografía."
       );
-
     };
 
 
   img.src =
-    imageUrl(photo);
+    imageUrl(
+      photo
+    );
 }
 
 
 /* ==========================================================
-   GALERÍA
+   OBTENER TODAS LAS FOTOS DEL MUNICIPIO / LOCALIDAD
    ========================================================== */
 
-function cardPlace(photo) {
+async function fetchAllGalleryPhotos(
+  params
+) {
+
+  const result =
+    [];
+
+
+  let offset =
+    0;
+
+
+  while (
+    true
+  ) {
+
+    const query =
+      new URLSearchParams({
+
+        action:
+          "fotos",
+
+
+        limit:
+          "500",
+
+
+        offset:
+          String(
+            offset
+          ),
+
+
+        ...params
+      });
+
+
+    const data =
+      await fetchJson(
+
+        `/api/data?${query}`
+      );
+
+
+    const items =
+      data.items ||
+      [];
+
+
+    result.push(
+      ...items
+    );
+
+
+    if (
+
+      data.nextOffset ===
+        null
+
+      ||
+
+      data.nextOffset ===
+        undefined
+
+      ||
+
+      !items.length
+
+    ) {
+
+      break;
+    }
+
+
+    offset =
+      data.nextOffset;
+  }
+
+
+  return result;
+}
+
+
+/* ==========================================================
+   NOMBRE PARA TARJETA
+   ========================================================== */
+
+function cardPlace(
+  photo
+) {
 
   if (
     photo.localidad
   ) {
+
     return photo.localidad;
   }
+
 
   const locations =
     splitPipe(
       photo.localidades_relacionadas
     );
 
+
   if (
-    locations.length === 1
+    locations.length ===
+    1
   ) {
+
     return locations[0];
   }
 
+
   return (
-    municipalityOf(photo) ||
+
+    municipalityOf(
+      photo
+    )
+
+    ||
+
     "TPBV"
   );
 }
 
+
+/* ==========================================================
+   SELECCIONAR / DESELECCIONAR FOTO
+   ========================================================== */
+
+function togglePhotoSelection(
+  photo
+) {
+
+  if (
+
+    selectedPhotoIds
+      .has(
+        photo.foto_id
+      )
+
+  ) {
+
+    selectedPhotoIds
+      .delete(
+        photo.foto_id
+      );
+  }
+
+  else {
+
+    selectedPhotoIds
+      .add(
+        photo.foto_id
+      );
+  }
+
+
+  updateSelectionUI();
+}
+
+
+/* ==========================================================
+   ACTUALIZAR UI SELECCIÓN
+   ========================================================== */
 
 function updateSelectionUI() {
 
   const count =
     selectedPhotoIds.size;
 
-  const countElement =
-    $("selectedCount");
 
-  const dock =
-    $("selectionDock");
+  /* CONTADOR */
 
-  if (countElement) {
+  if (
+    $("selectedCount")
+  ) {
 
-    countElement.textContent =
+    $("selectedCount")
+      .textContent =
+
       `${count} seleccionada${
         count === 1
           ? ""
           : "s"
       }`;
-
   }
 
-  if (dock) {
 
-    dock.classList.toggle(
+  /* BARRA INFERIOR */
+
+  $("selectionDock")
+    ?.classList
+    .toggle(
+
       "hidden",
-      count === 0
+
+      count ===
+      0
     );
 
+
+  /* BOTÓN SUPERIOR */
+
+  if (
+    $("downloadSelectedTopBtn")
+  ) {
+
+    $("downloadSelectedTopBtn")
+      .disabled =
+
+      count ===
+      0;
   }
 
+
+  /* TARJETAS */
 
   document
     .querySelectorAll(
       ".gallery-card"
     )
-    .forEach(card => {
 
-      const selected =
-        selectedPhotoIds.has(
-          card.dataset.photoId
-        );
+    .forEach(
 
-      card.classList.toggle(
-        "selected",
-        selected
-      );
+      card => {
 
-      const input =
-        card.querySelector(
-          "input"
-        );
+        const selected =
+          selectedPhotoIds
+            .has(
+              card.dataset.photoId
+            );
 
-      if (input) {
 
-        input.checked =
-          selected;
+        card
+          .classList
+          .toggle(
 
+            "selected",
+
+            selected
+          );
+
+
+        card
+          .setAttribute(
+
+            "aria-pressed",
+
+            selected
+              ? "true"
+              : "false"
+          );
       }
-
-    });
+    );
 }
 
 
-function createGalleryCard(photo) {
+/* ==========================================================
+   CREAR TARJETA DE FOTO
+   ========================================================== */
+
+function createGalleryCard(
+  photo
+) {
 
   const card =
     document.createElement(
       "article"
     );
 
+
   card.className =
     "gallery-card";
+
 
   card.dataset.photoId =
     photo.foto_id;
 
 
-  /* =========================
-     SELECTOR
-     ========================= */
+  card.tabIndex =
+    0;
+
+
+  card.setAttribute(
+
+    "role",
+
+    "button"
+  );
+
+
+  card.setAttribute(
+
+    "aria-label",
+
+    `Seleccionar fotografía de ${cardPlace(photo)}`
+  );
+
+
+  /* ========================================================
+     CHECK
+     ======================================================== */
 
   const selector =
     document.createElement(
-      "label"
+      "span"
     );
+
 
   selector.className =
     "select-photo";
 
 
-  const input =
-    document.createElement(
-      "input"
-    );
+  selector.setAttribute(
 
-  input.type =
-    "checkbox";
+    "aria-hidden",
 
-  input.setAttribute(
-    "aria-label",
-    `Seleccionar ${photo.foto_id}`
+    "true"
   );
 
 
-  const check =
-    document.createElement(
-      "span"
-    );
-
-  check.textContent =
-    "✓";
+  selector.innerHTML =
+    "<span>✓</span>";
 
 
-  input.addEventListener(
-    "change",
-    () => {
-
-      if (
-        input.checked
-      ) {
-
-        if (
-          selectedPhotoIds.size >=
-          10
-        ) {
-
-          input.checked =
-            false;
-
-          setStatus(
-            "Puedes seleccionar hasta 10 fotografías por ZIP."
-          );
-
-          return;
-        }
-
-        selectedPhotoIds.add(
-          photo.foto_id
-        );
-
-      } else {
-
-        selectedPhotoIds.delete(
-          photo.foto_id
-        );
-
-      }
-
-      updateSelectionUI();
-
-    }
-  );
-
-
-  selector.append(
-    input,
-    check
-  );
-
-
-  /* =========================
+  /* ========================================================
      IMAGEN
-     ========================= */
+     ======================================================== */
 
   const img =
     document.createElement(
       "img"
     );
 
+
   img.loading =
     "lazy";
 
+
   img.src =
-    imageUrl(photo);
+    imageUrl(
+      photo
+    );
+
 
   img.alt =
+
     `Fotografía de ${cardPlace(photo)}`;
 
 
-  /* =========================
-     INFORMACIÓN
-     ========================= */
+  /* ========================================================
+     PIE
+     ======================================================== */
 
   const body =
     document.createElement(
       "div"
     );
+
 
   body.className =
     "gallery-card-body";
@@ -571,62 +885,196 @@ function createGalleryCard(photo) {
       "strong"
     );
 
+
   title.textContent =
-    cardPlace(photo);
+    cardPlace(
+      photo
+    );
 
 
-  /* =========================
-     DESCARGAR
-     ========================= */
+  /* ========================================================
+     BOTÓN DESCARGAR INDIVIDUAL
+     ======================================================== */
 
   const download =
     document.createElement(
       "a"
     );
 
+
   download.className =
     "gallery-download";
 
+
   download.href =
-    downloadUrl(photo);
+    downloadUrl(
+      photo
+    );
 
-  download.title =
-    "Descargar fotografía";
 
-  download.textContent =
-    "↓";
+  download.setAttribute(
 
+    "aria-label",
+
+    "Descargar esta fotografía"
+  );
+
+
+  download.innerHTML = `
+
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true">
+
+        <path
+          d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5M5 18v2h14v-2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+      </svg>
+
+      <span>
+        Descargar
+      </span>
+  `;
+
+
+  /*
+   * Si se toca descargar,
+   * NO seleccionamos la tarjeta.
+   */
+
+  download
+    .addEventListener(
+
+      "click",
+
+      event =>
+
+        event.stopPropagation()
+    );
+
+
+  /* ========================================================
+     ARMAR TARJETA
+     ======================================================== */
 
   body.append(
+
     title,
+
     download
   );
 
+
   card.append(
+
     selector,
+
     img,
+
     body
   );
+
+
+  /* ========================================================
+     TODA LA FOTO SELECCIONA
+     ======================================================== */
+
+  card
+    .addEventListener(
+
+      "click",
+
+      event => {
+
+        /*
+         * Si tocó el botón descargar,
+         * no cambiar selección.
+         */
+
+        if (
+
+          event.target
+            .closest(
+              "a"
+            )
+
+        ) {
+
+          return;
+        }
+
+
+        togglePhotoSelection(
+          photo
+        );
+      }
+    );
+
+
+  /* ========================================================
+     ACCESIBILIDAD TECLADO
+     ======================================================== */
+
+  card
+    .addEventListener(
+
+      "keydown",
+
+      event => {
+
+        if (
+
+          event.key ===
+            "Enter"
+
+          ||
+
+          event.key ===
+            " "
+
+        ) {
+
+          event
+            .preventDefault();
+
+
+          togglePhotoSelection(
+            photo
+          );
+        }
+      }
+    );
+
 
   return card;
 }
 
 
-function renderGallery(items) {
+/* ==========================================================
+   RENDER GALERÍA
+   ========================================================== */
+
+function renderGallery() {
 
   const gallery =
     $("gallery");
 
-  if (!gallery) {
-    return;
-  }
 
   gallery.innerHTML =
     "";
 
 
+  /* ========================================================
+     VACÍA
+     ======================================================== */
+
   if (
-    !items.length
+    !filteredGalleryPhotos.length
   ) {
 
     $("galleryEmpty")
@@ -634,6 +1082,14 @@ function renderGallery(items) {
       .remove(
         "hidden"
       );
+
+
+    $("loadMoreBtn")
+      ?.classList
+      .add(
+        "hidden"
+      );
+
 
     return;
   }
@@ -646,97 +1102,198 @@ function renderGallery(items) {
     );
 
 
+  /* ========================================================
+     PINTAR
+     ======================================================== */
+
   const fragment =
-    document.createDocumentFragment();
+    document
+      .createDocumentFragment();
 
 
-  items.forEach(
-    photo => {
+  filteredGalleryPhotos
 
-      fragment.append(
-        createGalleryCard(
-          photo
-        )
-      );
+    .slice(
+      0,
+      renderLimit
+    )
 
-    }
-  );
+    .forEach(
+
+      photo =>
+
+        fragment
+          .append(
+
+            createGalleryCard(
+              photo
+            )
+          )
+    );
 
 
   gallery.append(
     fragment
   );
 
+
+  /* ========================================================
+     CARGAR MÁS
+     ======================================================== */
+
+  const loadMore =
+    $("loadMoreBtn");
+
+
+  const pending =
+
+    filteredGalleryPhotos.length
+
+    -
+
+    renderLimit;
+
+
+  loadMore
+    ?.classList
+    .toggle(
+
+      "hidden",
+
+      pending <=
+      0
+    );
+
+
+  if (
+
+    loadMore
+
+    &&
+
+    pending >
+    0
+
+  ) {
+
+    loadMore.textContent =
+
+      `Cargar más (${pending} restantes)`;
+  }
+
+
   updateSelectionUI();
 }
 
 
+/* ==========================================================
+   BUSCADOR
+   ========================================================== */
+
 function applyGallerySearch() {
-
-  const input =
-    $("gallerySearch");
-
-  if (!input) {
-    return;
-  }
-
 
   const query =
     String(
-      input.value || ""
+
+      $("gallerySearch")
+        ?.value
+
+      ||
+
+      ""
     )
+
       .trim()
+
       .toLocaleLowerCase(
         "es"
       );
 
 
   filteredGalleryPhotos =
+
     !query
-      ? visibleGalleryPhotos
-      : visibleGalleryPhotos
-          .filter(
-            photo => {
 
-              const text =
-                [
-                  cardPlace(photo),
-                  photo.municipio,
-                  photo.localidad,
-                  photo.foto_id
-                ]
-                  .join(" ")
-                  .toLocaleLowerCase(
-                    "es"
-                  );
+      ?
 
-              return text.includes(
+      visibleGalleryPhotos
+
+      :
+
+      visibleGalleryPhotos
+        .filter(
+
+          photo => {
+
+            const text =
+
+              [
+
+                cardPlace(
+                  photo
+                ),
+
+                photo.municipio,
+
+                photo.localidad,
+
+                photo.foto_id
+
+              ]
+
+                .join(
+                  " "
+                )
+
+                .toLocaleLowerCase(
+                  "es"
+                );
+
+
+            return text
+              .includes(
                 query
               );
+          }
+        );
 
-            }
-          );
+
+  renderLimit =
+    120;
 
 
-  renderGallery(
-    filteredGalleryPhotos
-  );
+  renderGallery();
 }
 
 
-function showGallery(
-  items,
-  title,
-  total
+/* ==========================================================
+   CARGAR GALERÍA
+   ========================================================== */
+
+async function loadGallery(
+
+  params,
+
+  title
+
 ) {
 
-  visibleGalleryPhotos =
-    items;
+  activeGalleryParams =
+    {
+      ...params
+    };
 
-  filteredGalleryPhotos =
-    items;
 
-  selectedPhotoIds.clear();
+  activeGalleryTitle =
+    title;
+
+
+  renderLimit =
+    120;
+
+
+  selectedPhotoIds
+    .clear();
 
 
   $("gallerySection")
@@ -746,126 +1303,144 @@ function showGallery(
     );
 
 
-  if (
-    $("galleryTitle")
-  ) {
+  $("galleryTitle")
+    .textContent =
+
+    "Cargando fotografías…";
+
+
+  $("galleryCount")
+    .textContent =
+    "";
+
+
+  $("galleryScopeHelp")
+    .textContent =
+
+    "Cargando todas las fotografías disponibles…";
+
+
+  $("gallery")
+    .innerHTML =
+    "";
+
+
+  $("loadMoreBtn")
+    ?.classList
+    .add(
+      "hidden"
+    );
+
+
+  updateSelectionUI();
+
+
+  try {
+
+    /* ======================================================
+       OBTENER TODAS
+       ====================================================== */
+
+    const items =
+      await fetchAllGalleryPhotos(
+        params
+      );
+
+
+    visibleGalleryPhotos =
+      items;
+
+
+    filteredGalleryPhotos =
+      items;
+
+
+    /* ======================================================
+       TÍTULO
+       ====================================================== */
 
     $("galleryTitle")
       .textContent =
       title;
 
-  }
-
-
-  if (
-    $("galleryCount")
-  ) {
 
     $("galleryCount")
       .textContent =
-      total >
-      items.length
-        ? `${items.length} de ${total}`
-        : `${items.length}`;
-
-  }
+      String(
+        items.length
+      );
 
 
-  if (
-    $("gallerySearch")
-  ) {
+    const scope =
+
+      params.localidad
+
+      ||
+
+      params.municipio
+
+      ||
+
+      "este territorio";
+
+
+    $("galleryScopeHelp")
+      .textContent =
+
+      `${items.length} fotografía${
+        items.length === 1
+          ? ""
+          : "s"
+      } en ${scope}. Toca cualquier imagen para seleccionarla.`;
+
+
+    /* ======================================================
+       TEXTO BOTÓN DESCARGAR TODAS
+       ====================================================== */
+
+    $("downloadAllScopeText")
+      .textContent =
+
+      params.localidad
+
+        ?
+
+        "Descargar toda la localidad"
+
+        :
+
+        "Descargar todo el municipio";
+
 
     $("gallerySearch")
       .value =
       "";
 
-  }
+
+    renderGallery();
 
 
-  renderGallery(
-    items
-  );
+    /* ======================================================
+       SCROLL
+       ====================================================== */
 
-  updateSelectionUI();
+    setTimeout(
 
+      () =>
 
-  setTimeout(
-    () => {
+        $("gallerySection")
+          ?.scrollIntoView({
 
-      $("gallerySection")
-        ?.scrollIntoView({
-          behavior:
-            "smooth",
+            behavior:
+              "smooth",
 
-          block:
-            "start"
-        });
+            block:
+              "start"
+          }),
 
-    },
-    40
-  );
-}
-
-
-async function loadGallery(
-  params,
-  title
-) {
-
-  try {
-
-    $("gallerySection")
-      ?.classList
-      .remove(
-        "hidden"
-      );
-
-
-    if (
-      $("galleryTitle")
-    ) {
-
-      $("galleryTitle")
-        .textContent =
-        "Cargando fotografías…";
-
-    }
-
-
-    if (
-      $("galleryCount")
-    ) {
-
-      $("galleryCount")
-        .textContent =
-        "";
-
-    }
-
-
-    const query =
-      new URLSearchParams({
-        action:
-          "fotos",
-
-        limit:
-          "120",
-
-        ...params
-      });
-
-
-    const data =
-      await fetchJson(
-        `/api/data?${query.toString()}`
-      );
-
-
-    showGallery(
-      data.items || [],
-      title,
-      data.total || 0
+      40
     );
+
 
   } catch (error) {
 
@@ -874,15 +1449,16 @@ async function loadGallery(
     );
 
 
-    if (
-      $("galleryTitle")
-    ) {
+    $("galleryTitle")
+      .textContent =
 
-      $("galleryTitle")
-        .textContent =
-        "No se pudieron cargar las fotografías";
+      "No se pudieron cargar las fotografías";
 
-    }
+
+    $("galleryScopeHelp")
+      .textContent =
+
+      error.message;
 
 
     setStatus(
@@ -893,75 +1469,67 @@ async function loadGallery(
 
 
 /* ==========================================================
-   BOTÓN DE LOCALIDAD
+   BOTÓN LOCALIDAD
    ========================================================== */
 
-function localityButton(name) {
+function localityButton(
+  name
+) {
 
-  const btn =
+  const button =
     document.createElement(
       "button"
     );
 
-  btn.className =
+
+  button.className =
     "locality-choice";
 
-  btn.type =
+
+  button.type =
     "button";
 
 
-  const icon =
-    document.createElement(
-      "span"
-    );
+  button.innerHTML = `
 
-  icon.className =
-    "locality-choice-icon";
+      <span
+        class="locality-choice-icon">
 
-  icon.textContent =
-    "•";
+        •
+
+      </span>
+
+      <span></span>
+
+      <span
+        class="locality-choice-arrow">
+
+        ›
+
+      </span>
+  `;
 
 
-  const label =
-    document.createElement(
-      "span"
-    );
-
-  label.textContent =
+  button.children[1]
+    .textContent =
     name;
 
 
-  const arrow =
-    document.createElement(
-      "span"
-    );
-
-  arrow.className =
-    "locality-choice-arrow";
-
-  arrow.textContent =
-    "›";
-
-
-  btn.append(
-    icon,
-    label,
-    arrow
-  );
-
-
-  btn.onclick =
+  button.onclick =
     () =>
+
       loadGallery(
+
         {
           localidad:
             name
         },
+
         `Fotos de ${name}`
       );
 
 
-  return btn;
+  return button;
 }
 
 
@@ -974,20 +1542,13 @@ function renderRelated() {
   const section =
     $("relatedSection");
 
+
   const choices =
     $("localityChoices");
 
+
   const municipalityBtn =
     $("municipalityBtn");
-
-
-  if (
-    !section ||
-    !choices ||
-    !municipalityBtn
-  ) {
-    return;
-  }
 
 
   choices.innerHTML =
@@ -1007,23 +1568,31 @@ function renderRelated() {
     );
 
 
-  /* ==============================
+  /* ========================================================
      EXACTA
-     ============================== */
+     ======================================================== */
 
   if (
+
     current.tipo_asociacion ===
-      "EXACTA" &&
+      "EXACTA"
+
+    &&
+
     current.localidad
+
   ) {
 
-    section.classList.remove(
-      "hidden"
-    );
+    section
+      .classList
+      .remove(
+        "hidden"
+      );
 
 
     $("relatedTitle")
       .textContent =
+
       "Explora esta localidad";
 
 
@@ -1034,51 +1603,58 @@ function renderRelated() {
 
     $("relatedHelp")
       .textContent =
-      "Consulta más fotografías de esta localidad o amplía la búsqueda al municipio.";
+
+      "Consulta, selecciona o descarga todas las fotografías de esta localidad.";
 
 
     choices.append(
+
       localityButton(
         current.localidad
       )
     );
-
   }
 
-  /* ==============================
+
+  /* ========================================================
      NO EXACTA
-     ============================== */
+     ======================================================== */
 
   else {
 
     const localities =
       uniqueSorted(
+
         splitPipe(
           current.localidades_relacionadas
         )
       );
 
 
-    /* ============================
+    /* ======================================================
        MULTILOCALIDAD
-       ============================ */
+       ====================================================== */
 
     if (
       localities.length
     ) {
 
-      section.classList.remove(
-        "hidden"
-      );
+      section
+        .classList
+        .remove(
+          "hidden"
+        );
 
 
       $("relatedTitle")
         .textContent =
+
         "Localidades relacionadas";
 
 
       $("relatedCount")
         .textContent =
+
         String(
           localities.length
         );
@@ -1086,35 +1662,43 @@ function renderRelated() {
 
       $("relatedHelp")
         .textContent =
-        localities.length === 1
 
-          ? "Este reporte está relacionado con una localidad."
+        localities.length ===
+        1
 
-          : "Este reporte está relacionado con varias localidades. Elige una para explorar sus fotografías.";
+          ?
+
+          "Entra a la localidad para consultar o descargar todas sus fotografías."
+
+          :
+
+          "Elige una localidad para consultar, seleccionar o descargar sus fotografías.";
 
 
-      localities.forEach(
-        locality => {
+      localities
+        .forEach(
 
-          choices.append(
-            localityButton(
-              locality
+          locality =>
+
+            choices.append(
+
+              localityButton(
+                locality
+              )
             )
-          );
-
-        }
-      );
-
+        );
     }
 
-    /* ============================
+
+    /* ======================================================
        MUNICIPIOS
-       ============================ */
+       ====================================================== */
 
     else {
 
       const municipalities =
         uniqueSorted(
+
           splitPipe(
             current.municipios_relacionados
           )
@@ -1125,18 +1709,22 @@ function renderRelated() {
         municipalities.length
       ) {
 
-        section.classList.remove(
-          "hidden"
-        );
+        section
+          .classList
+          .remove(
+            "hidden"
+          );
 
 
         $("relatedTitle")
           .textContent =
+
           "Municipios relacionados";
 
 
         $("relatedCount")
           .textContent =
+
           String(
             municipalities.length
           );
@@ -1144,46 +1732,48 @@ function renderRelated() {
 
         $("relatedHelp")
           .textContent =
-          "Elige un municipio para consultar sus fotografías.";
+
+          "Elige un municipio para consultar o descargar sus fotografías.";
 
 
-        municipalities.forEach(
-          municipalityName => {
+        municipalities
+          .forEach(
 
-            const btn =
-              localityButton(
-                municipalityName
-              );
+            municipalityName => {
 
-
-            btn.onclick =
-              () =>
-                loadGallery(
-                  {
-                    municipio:
-                      municipalityName
-                  },
-                  `Fotos de ${municipalityName}`
+              const button =
+                localityButton(
+                  municipalityName
                 );
 
 
-            choices.append(
-              btn
-            );
+              button.onclick =
+                () =>
 
-          }
-        );
+                  loadGallery(
 
+                    {
+                      municipio:
+                        municipalityName
+                    },
+
+                    `Fotos de ${municipalityName}`
+                  );
+
+
+              choices.append(
+                button
+              );
+            }
+          );
       }
-
     }
-
   }
 
 
-  /* ==============================
-     BOTÓN MUNICIPIO
-     ============================== */
+  /* ========================================================
+     VER TODO EL MUNICIPIO
+     ======================================================== */
 
   if (
     municipality
@@ -1203,16 +1793,17 @@ function renderRelated() {
 
     municipalityBtn.onclick =
       () =>
+
         loadGallery(
+
           {
             municipio:
               municipality
           },
+
           `Fotos de ${municipality}`
         );
-
   }
-
 }
 
 
@@ -1235,7 +1826,8 @@ const CRC_TABLE =
       n++
     ) {
 
-      let c = n;
+      let c =
+        n;
 
 
       for (
@@ -1245,35 +1837,50 @@ const CRC_TABLE =
       ) {
 
         c =
-          (c & 1)
 
-            ? (
-                0xEDB88320 ^
-                (c >>> 1)
+          (
+            c & 1
+          )
+
+            ?
+
+            (
+              0xEDB88320
+              ^
+              (
+                c >>>
+                1
               )
+            )
 
-            : (
-                c >>> 1
-              );
+            :
 
+            (
+              c >>>
+              1
+            );
       }
 
 
       table[n] =
         c >>> 0;
-
     }
 
 
     return table;
-
   })();
 
 
-function crc32(bytes) {
+/* ==========================================================
+   CRC32
+   ========================================================== */
+
+function crc32(
+  bytes
+) {
 
   let crc =
-    0 ^ -1;
+    -1;
 
 
   for (
@@ -1283,58 +1890,110 @@ function crc32(bytes) {
   ) {
 
     crc =
-      (crc >>> 8) ^
+
+      (
+        crc >>>
+        8
+      )
+
+      ^
 
       CRC_TABLE[
+
         (
-          crc ^
+          crc
+          ^
           bytes[i]
-        ) &
+        )
+
+        &
+
         0xFF
       ];
-
   }
 
 
   return (
-    crc ^
+
+    crc
+    ^
     -1
+
   ) >>> 0;
 }
 
 
-function u16(value) {
+/* ==========================================================
+   ENTEROS ZIP
+   ========================================================== */
 
-  return new Uint8Array([
-    value & 255,
-    (value >>> 8) & 255
-  ]);
+const u16 =
+  value =>
 
-}
+    new Uint8Array([
 
+      value &
+      255,
 
-function u32(value) {
-
-  return new Uint8Array([
-    value & 255,
-    (value >>> 8) & 255,
-    (value >>> 16) & 255,
-    (value >>> 24) & 255
-  ]);
-
-}
+      (
+        value >>>
+        8
+      )
+      &
+      255
+    ]);
 
 
-function concatBytes(parts) {
+const u32 =
+  value =>
+
+    new Uint8Array([
+
+      value &
+      255,
+
+      (
+        value >>>
+        8
+      )
+      &
+      255,
+
+      (
+        value >>>
+        16
+      )
+      &
+      255,
+
+      (
+        value >>>
+        24
+      )
+      &
+      255
+    ]);
+
+
+/* ==========================================================
+   UNIR BYTES
+   ========================================================== */
+
+function concatBytes(
+  parts
+) {
 
   const length =
     parts.reduce(
+
       (
         sum,
         part
       ) =>
+
         sum +
         part.length,
+
       0
     );
 
@@ -1355,13 +2014,15 @@ function concatBytes(parts) {
   ) {
 
     output.set(
+
       part,
+
       offset
     );
 
+
     offset +=
       part.length;
-
   }
 
 
@@ -1369,24 +2030,130 @@ function concatBytes(parts) {
 }
 
 
-function safeFilename(name) {
+/* ==========================================================
+   NOMBRE SEGURO
+   ========================================================== */
+
+function safeFilename(
+  name
+) {
 
   return String(
-    name ||
+
+    name
+
+    ||
+
     "foto.jpg"
   )
+
     .replace(
+
       /[<>:"/\\|?*\x00-\x1F]+/g,
+
       "_"
     )
+
     .slice(
       0,
-      150
+      145
     );
 }
 
 
-function makeStoredZip(files) {
+/* ==========================================================
+   EVITAR NOMBRES REPETIDOS
+   ========================================================== */
+
+function uniqueFilename(
+
+  name,
+
+  used
+
+) {
+
+  const clean =
+    safeFilename(
+      name
+    );
+
+
+  const dot =
+    clean.lastIndexOf(
+      "."
+    );
+
+
+  const base =
+
+    dot > 0
+
+      ?
+
+      clean.slice(
+        0,
+        dot
+      )
+
+      :
+
+      clean;
+
+
+  const extension =
+
+    dot > 0
+
+      ?
+
+      clean.slice(
+        dot
+      )
+
+      :
+
+      "";
+
+
+  let candidate =
+    clean;
+
+
+  let number =
+    2;
+
+
+  while (
+
+    used.has(
+      candidate.toLowerCase()
+    )
+
+  ) {
+
+    candidate =
+
+      `${base}_${number++}${extension}`;
+  }
+
+
+  used.add(
+    candidate.toLowerCase()
+  );
+
+
+  return candidate;
+}
+
+
+/* ==========================================================
+   CREAR ZIP
+   ========================================================== */
+
+function makeStoredZip(
+  files
+) {
 
   const encoder =
     new TextEncoder();
@@ -1410,46 +2177,64 @@ function makeStoredZip(files) {
 
   const year =
     Math.max(
+
       1980,
+
       now.getFullYear()
     );
 
 
   const dosTime =
+
     (
       now.getHours()
-      << 11
+      <<
+      11
     )
+
     |
+
     (
       now.getMinutes()
-      << 5
+      <<
+      5
     )
+
     |
+
     Math.floor(
+
       now.getSeconds()
-      / 2
+      /
+      2
     );
 
 
   const dosDate =
+
     (
       (
         year -
         1980
       )
-      << 9
+      <<
+      9
     )
+
     |
+
     (
       (
         now.getMonth()
         +
         1
       )
-      << 5
+      <<
+      5
     )
+
     |
+
     now.getDate();
 
 
@@ -1474,19 +2259,28 @@ function makeStoredZip(files) {
       );
 
 
+    /* ======================================================
+       LOCAL
+       ====================================================== */
+
     const local =
       concatBytes([
+
         u32(
           0x04034b50
         ),
 
-        u16(20),
+        u16(
+          20
+        ),
 
         u16(
           0x0800
         ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
         u16(
           dosTime
@@ -1512,7 +2306,9 @@ function makeStoredZip(files) {
           nameBytes.length
         ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
         nameBytes,
 
@@ -1525,21 +2321,32 @@ function makeStoredZip(files) {
     );
 
 
+    /* ======================================================
+       CENTRAL
+       ====================================================== */
+
     const central =
       concatBytes([
+
         u32(
           0x02014b50
         ),
 
-        u16(20),
+        u16(
+          20
+        ),
 
-        u16(20),
+        u16(
+          20
+        ),
 
         u16(
           0x0800
         ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
         u16(
           dosTime
@@ -1565,15 +2372,25 @@ function makeStoredZip(files) {
           nameBytes.length
         ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
-        u16(0),
+        u16(
+          0
+        ),
 
-        u32(0),
+        u32(
+          0
+        ),
 
         u32(
           offset
@@ -1590,31 +2407,46 @@ function makeStoredZip(files) {
 
     offset +=
       local.length;
-
   }
 
 
+  /* ========================================================
+     TAMAÑO CENTRAL
+     ======================================================== */
+
   const centralSize =
     centralParts.reduce(
+
       (
         sum,
         part
       ) =>
+
         sum +
         part.length,
+
       0
     );
 
 
+  /* ========================================================
+     FIN ZIP
+     ======================================================== */
+
   const end =
     concatBytes([
+
       u32(
         0x06054b50
       ),
 
-      u16(0),
+      u16(
+        0
+      ),
 
-      u16(0),
+      u16(
+        0
+      ),
 
       u16(
         files.length
@@ -1632,18 +2464,27 @@ function makeStoredZip(files) {
         offset
       ),
 
-      u16(0)
+      u16(
+        0
+      )
     ]);
 
 
   return new Blob(
+
     [
+
       ...localParts,
+
       ...centralParts,
+
       end
     ],
+
     {
+
       type:
+
         "application/zip"
     }
   );
@@ -1651,208 +2492,448 @@ function makeStoredZip(files) {
 
 
 /* ==========================================================
-   DESCARGAR SELECCIÓN
+   PREPARAR FOTO PARA ZIP
    ========================================================== */
 
-async function downloadSelected() {
+async function fetchPhotoForZip(
+  photo
+) {
 
-  const ids =
-    [
-      ...selectedPhotoIds
-    ];
+  const response =
+    await fetch(
+      imageUrl(
+        photo
+      )
+    );
 
 
   if (
-    !ids.length
+    !response.ok
   ) {
+
+    return null;
+  }
+
+
+  const data =
+    new Uint8Array(
+
+      await response
+        .arrayBuffer()
+    );
+
+
+  const contentType =
+    response.headers
+      .get(
+        "content-type"
+      )
+
+    ||
+
+    "";
+
+
+  let extension =
+    ".jpg";
+
+
+  if (
+    contentType.includes(
+      "png"
+    )
+  ) {
+
+    extension =
+      ".png";
+  }
+
+
+  else if (
+
+    contentType.includes(
+      "webp"
+    )
+
+  ) {
+
+    extension =
+      ".webp";
+  }
+
+
+  const base =
+    String(
+
+      photo.nombre_archivo
+
+      ||
+
+      photo.foto_id
+    )
+
+      .replace(
+
+        /\.[^.]+$/,
+
+        ""
+      );
+
+
+  return {
+
+    proposedName:
+
+      `${base}${extension}`,
+
+
+    data
+  };
+}
+
+
+/* ==========================================================
+   DESCARGAR MUCHAS FOTOS COMO ZIP
+   ========================================================== */
+
+async function downloadPhotosAsZip(
+
+  photos,
+
+  filename
+
+) {
+
+  if (
+    !photos.length
+  ) {
+
+    setStatus(
+      "No hay fotografías para descargar."
+    );
+
+
     return;
   }
 
 
-  const selected =
-    visibleGalleryPhotos
-      .filter(
-        photo =>
-          selectedPhotoIds.has(
-            photo.foto_id
+  /* ========================================================
+     MENSAJE
+     ======================================================== */
+
+  setStatus(
+
+    `Preparando ${photos.length} fotografías. No cierres esta página…`,
+
+    true
+  );
+
+
+  const files =
+    [];
+
+
+  const usedNames =
+    new Set();
+
+
+  let nextIndex =
+    0;
+
+
+  let completed =
+    0;
+
+
+  /*
+   * 4 al mismo tiempo.
+   *
+   * Evita saturar el teléfono.
+   */
+
+  const concurrency =
+    4;
+
+
+  /* ========================================================
+     WORKER
+     ======================================================== */
+
+  async function worker() {
+
+    while (
+      true
+    ) {
+
+      const index =
+        nextIndex++;
+
+
+      if (
+        index >=
+        photos.length
+      ) {
+
+        return;
+      }
+
+
+      const photo =
+        photos[index];
+
+
+      try {
+
+        const result =
+          await fetchPhotoForZip(
+            photo
+          );
+
+
+        if (
+          result
+        ) {
+
+          files.push({
+
+            name:
+
+              uniqueFilename(
+
+                result.proposedName,
+
+                usedNames
+              ),
+
+
+            data:
+
+              result.data
+          });
+        }
+
+
+      } catch (error) {
+
+        console.error(
+
+          "Error preparando",
+
+          photo.foto_id,
+
+          error
+        );
+      }
+
+
+      completed++;
+
+
+      if (
+
+        completed ===
+          photos.length
+
+        ||
+
+        completed %
+        5 ===
+        0
+
+      ) {
+
+        setStatus(
+
+          `Preparando ${completed} de ${photos.length}…`,
+
+          true
+        );
+      }
+    }
+  }
+
+
+  /* ========================================================
+     EJECUTAR WORKERS
+     ======================================================== */
+
+  await Promise.all(
+
+    Array.from(
+
+      {
+
+        length:
+
+          Math.min(
+
+            concurrency,
+
+            photos.length
           )
+      },
+
+      worker
+    )
+  );
+
+
+  /* ========================================================
+     VALIDAR
+     ======================================================== */
+
+  if (
+    !files.length
+  ) {
+
+    throw new Error(
+
+      "No fue posible preparar ninguna fotografía."
+    );
+  }
+
+
+  /* ========================================================
+     CREAR ZIP
+     ======================================================== */
+
+  setStatus(
+
+    `Creando ZIP con ${files.length} fotografías…`,
+
+    true
+  );
+
+
+  const blob =
+    makeStoredZip(
+      files
+    );
+
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const anchor =
+    document.createElement(
+      "a"
+    );
+
+
+  anchor.href =
+    url;
+
+
+  anchor.download =
+    filename;
+
+
+  document.body.appendChild(
+    anchor
+  );
+
+
+  anchor.click();
+
+
+  anchor.remove();
+
+
+  setTimeout(
+
+    () =>
+
+      URL.revokeObjectURL(
+        url
+      ),
+
+    30000
+  );
+
+
+  setStatus(
+
+    `ZIP preparado: ${files.length} fotografías.`
+  );
+}
+
+
+/* ==========================================================
+   OBTENER SELECCIONADAS
+   ========================================================== */
+
+function selectedPhotos() {
+
+  return visibleGalleryPhotos
+    .filter(
+
+      photo =>
+
+        selectedPhotoIds.has(
+          photo.foto_id
+        )
+    );
+}
+
+
+/* ==========================================================
+   DESCARGAR SELECCIONADAS
+   ========================================================== */
+
+async function downloadSelected() {
+
+  const items =
+    selectedPhotos();
+
+
+  if (
+    !items.length
+  ) {
+
+    setStatus(
+
+      "Primero selecciona una o más fotografías."
+    );
+
+
+    return;
+  }
+
+
+  const safeTitle =
+    (
+      activeGalleryTitle
+
+      ||
+
+      "fotos"
+    )
+
+      .replace(
+
+        /[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]+/g,
+
+        "_"
+      )
+
+      .slice(
+        0,
+        80
       );
 
 
   try {
 
-    setStatus(
-      `Preparando ${selected.length} fotografía${
-        selected.length === 1
-          ? ""
-          : "s"
-      }…`
+    await downloadPhotosAsZip(
+
+      items,
+
+      `TPBV_${safeTitle}_seleccionadas.zip`
     );
 
-
-    const files =
-      [];
-
-
-    for (
-      let i = 0;
-      i < selected.length;
-      i++
-    ) {
-
-      const photo =
-        selected[i];
-
-
-      setStatus(
-        `Preparando ${
-          i + 1
-        } de ${
-          selected.length
-        }…`
-      );
-
-
-      const response =
-        await fetch(
-          imageUrl(photo)
-        );
-
-
-      if (
-        !response.ok
-      ) {
-        continue;
-      }
-
-
-      const bytes =
-        new Uint8Array(
-          await response
-            .arrayBuffer()
-        );
-
-
-      const contentType =
-        response.headers
-          .get(
-            "content-type"
-          ) || "";
-
-
-      let extension =
-        ".jpg";
-
-
-      if (
-        contentType.includes(
-          "png"
-        )
-      ) {
-
-        extension =
-          ".png";
-
-      }
-
-      else if (
-        contentType.includes(
-          "webp"
-        )
-      ) {
-
-        extension =
-          ".webp";
-
-      }
-
-
-      const base =
-        String(
-          photo.nombre_archivo ||
-          photo.foto_id
-        )
-          .replace(
-            /\.[^.]+$/,
-            ""
-          );
-
-
-      files.push({
-        name:
-          safeFilename(
-            base
-          )
-          +
-          extension,
-
-        data:
-          bytes
-      });
-
-    }
-
-
-    if (
-      !files.length
-    ) {
-
-      throw new Error(
-        "No se pudieron preparar las fotografías."
-      );
-
-    }
-
-
-    const zip =
-      makeStoredZip(
-        files
-      );
-
-
-    const url =
-      URL.createObjectURL(
-        zip
-      );
-
-
-    const a =
-      document.createElement(
-        "a"
-      );
-
-
-    a.href =
-      url;
-
-
-    a.download =
-      "fotos_tpbv_seleccionadas.zip";
-
-
-    document.body.appendChild(
-      a
-    );
-
-
-    a.click();
-
-
-    a.remove();
-
-
-    setTimeout(
-      () =>
-        URL.revokeObjectURL(
-          url
-        ),
-      30000
-    );
-
-
-    setStatus(
-      "Descarga preparada."
-    );
 
   } catch (error) {
 
@@ -1864,71 +2945,72 @@ async function downloadSelected() {
     setStatus(
       error.message
     );
-
   }
-
 }
 
 
 /* ==========================================================
-   INICIO
+   DESCARGAR TODA LOCALIDAD / MUNICIPIO
    ========================================================== */
 
-async function init() {
-
-  const fotoId =
-    photoIdFromPath();
-
-
-  console.log(
-    "TPBV foto_id:",
-    fotoId
-  );
-
+async function downloadAllCurrentScope() {
 
   if (
-    !fotoId
+    !visibleGalleryPhotos.length
   ) {
 
-    if (
-      $("detailPlace")
-    ) {
+    setStatus(
 
-      $("detailPlace")
-        .textContent =
-        "Fotografía no especificada";
-
-    }
-
-
-    if (
-      $("detailIntro")
-    ) {
-
-      $("detailIntro")
-        .textContent =
-        "El enlace no contiene el identificador de una fotografía.";
-
-    }
-
-
-    $("selectedSkeleton")
-      ?.classList
-      .add(
-        "hidden"
-      );
+      "No hay fotografías para descargar."
+    );
 
 
     return;
   }
 
 
+  const scope =
+
+    activeGalleryParams
+      ?.localidad
+
+    ||
+
+    activeGalleryParams
+      ?.municipio
+
+    ||
+
+    "territorio";
+
+
+  const safeScope =
+    String(
+      scope
+    )
+
+      .replace(
+
+        /[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ_-]+/g,
+
+        "_"
+      )
+
+      .slice(
+        0,
+        80
+      );
+
+
   try {
 
-    current =
-      await fetchJson(
-        `/api/data?action=foto&id=${encodeURIComponent(fotoId)}`
-      );
+    await downloadPhotosAsZip(
+
+      visibleGalleryPhotos,
+
+      `TPBV_${safeScope}_todas.zip`
+    );
+
 
   } catch (error) {
 
@@ -1937,26 +3019,41 @@ async function init() {
     );
 
 
-    if (
-      $("detailPlace")
-    ) {
-
-      $("detailPlace")
-        .textContent =
-        "Fotografía no encontrada";
-
-    }
+    setStatus(
+      error.message
+    );
+  }
+}
 
 
-    if (
-      $("detailIntro")
-    ) {
+/* ==========================================================
+   INICIALIZAR
+   ========================================================== */
 
-      $("detailIntro")
-        .textContent =
-        error.message;
+async function init() {
 
-    }
+  const fotoId =
+    photoIdFromPath();
+
+
+  /* ========================================================
+     SIN FOTO ID
+     ======================================================== */
+
+  if (
+    !fotoId
+  ) {
+
+    $("detailPlace")
+      .textContent =
+
+      "Fotografía no especificada";
+
+
+    $("detailIntro")
+      .textContent =
+
+      "El enlace no contiene el identificador de una fotografía.";
 
 
     $("selectedSkeleton")
@@ -1970,18 +3067,61 @@ async function init() {
   }
 
 
-  /* ==============================
-     FOTO
-     ============================== */
+  /* ========================================================
+     OBTENER FOTO
+     ======================================================== */
+
+  try {
+
+    current =
+      await fetchJson(
+
+        `/api/data?action=foto&id=${encodeURIComponent(fotoId)}`
+      );
+
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    $("detailPlace")
+      .textContent =
+
+      "Fotografía no encontrada";
+
+
+    $("detailIntro")
+      .textContent =
+
+      error.message;
+
+
+    $("selectedSkeleton")
+      ?.classList
+      .add(
+        "hidden"
+      );
+
+
+    return;
+  }
+
+
+  /* ========================================================
+     IMAGEN
+     ======================================================== */
 
   setMainImage(
     current
   );
 
 
-  /* ==============================
-     DATOS
-     ============================== */
+  /* ========================================================
+     INFORMACIÓN
+     ======================================================== */
 
   const municipality =
     municipalityOf(
@@ -1996,214 +3136,226 @@ async function init() {
 
 
   const person =
-    current.usuario_origen ||
+    current.usuario_origen
+    ||
     "";
 
 
   const related =
     uniqueSorted(
+
       splitPipe(
         current.localidades_relacionadas
       )
     );
 
 
-  if (
-    $("detailPlace")
-  ) {
+  $("detailPlace")
+    .textContent =
 
-    $("detailPlace")
-      .textContent =
-      primaryPlace(
-        current
-      );
-
-  }
+    primaryPlace(
+      current
+    );
 
 
-  if (
-    $("detailRole")
-  ) {
-
-    $("detailRole")
-      .textContent =
-      role;
-
-  }
+  $("detailRole")
+    .textContent =
+    role;
 
 
-  if (
-    $("selectedContext")
-  ) {
+  $("selectedContext")
+    .textContent =
 
-    $("selectedContext")
-      .textContent =
-      municipality ||
-      "TPBV";
+    municipality
 
-  }
+    ||
+
+    "TPBV";
 
 
-  if (
-    $("downloadCurrentBtn")
-  ) {
+  $("downloadCurrentBtn")
+    .href =
 
-    $("downloadCurrentBtn")
-      .href =
-      downloadUrl(
-        current
-      );
-
-  }
+    downloadUrl(
+      current
+    );
 
 
-  /* ==============================
+  /* ========================================================
      DESCRIPCIÓN
-     ============================== */
+     ======================================================== */
 
   if (
+
     current.tipo_asociacion ===
-      "EXACTA"
+    "EXACTA"
+
   ) {
 
     $("detailIntro")
       .textContent =
+
       person
 
-        ? `${role}: ${person}`
+        ?
 
-        : "Fotografía de Territorios de Paz y Buen Vivir.";
+        `${role}: ${person}`
 
+        :
+
+        "Fotografía de Territorios de Paz y Buen Vivir.";
   }
+
 
   else {
 
     const relation =
+
       related.length
 
-        ? `Reporte relacionado con ${related.length} localidad${
-            related.length === 1
-              ? ""
-              : "es"
-          }.`
+        ?
 
-        : "Fotografía relacionada con este territorio.";
+        `Reporte relacionado con ${related.length} localidad${
+          related.length === 1
+            ? ""
+            : "es"
+        }.`
+
+        :
+
+        "Fotografía relacionada con este territorio.";
 
 
     $("detailIntro")
       .textContent =
+
       person
 
-        ? `${relation} ${role}: ${person}.`
+        ?
 
-        : relation;
+        `${relation} ${role}: ${person}.`
 
+        :
+
+        relation;
   }
 
 
-  /* ==============================
-     RELACIONES
-     ============================== */
+  /* ========================================================
+     LOCALIDADES
+     ======================================================== */
 
   renderRelated();
 
 
-  /* ==============================
+  /* ========================================================
      BUSCADOR
-     ============================== */
+     ======================================================== */
 
   $("gallerySearch")
     ?.addEventListener(
+
       "input",
+
       applyGallerySearch
     );
 
 
-  /* ==============================
-     SELECCIONAR
-     ============================== */
+  /* ========================================================
+     CARGAR MÁS
+     ======================================================== */
 
-  if (
-    $("selectAllBtn")
-  ) {
+  $("loadMoreBtn")
+    ?.addEventListener(
 
-    $("selectAllBtn")
-      .onclick =
+      "click",
+
       () => {
 
-        selectedPhotoIds.clear();
+        renderLimit +=
+          120;
 
 
-        filteredGalleryPhotos
-          .slice(
-            0,
-            10
-          )
-          .forEach(
-            photo => {
+        renderGallery();
+      }
+    );
 
-              selectedPhotoIds.add(
+
+  /* ========================================================
+     SELECCIONAR TODAS
+     SIN LÍMITE DE 10
+     ======================================================== */
+
+  $("selectAllBtn")
+    .onclick =
+    () => {
+
+      filteredGalleryPhotos
+        .forEach(
+
+          photo =>
+
+            selectedPhotoIds
+              .add(
                 photo.foto_id
-              );
-
-            }
-          );
+              )
+        );
 
 
-        if (
-          filteredGalleryPhotos.length >
-          10
-        ) {
-
-          setStatus(
-            "Se seleccionaron las primeras 10 fotografías."
-          );
-
-        }
+      updateSelectionUI();
 
 
-        updateSelectionUI();
-
-      };
-
-  }
+      renderGallery();
+    };
 
 
-  /* ==============================
+  /* ========================================================
      LIMPIAR
-     ============================== */
+     ======================================================== */
 
-  if (
-    $("clearSelectionBtn")
-  ) {
+  $("clearSelectionBtn")
+    .onclick =
+    () => {
 
-    $("clearSelectionBtn")
-      .onclick =
-      () => {
-
-        selectedPhotoIds.clear();
-
-        updateSelectionUI();
-
-      };
-
-  }
+      selectedPhotoIds
+        .clear();
 
 
-  /* ==============================
-     DESCARGAR ZIP
-     ============================== */
+      updateSelectionUI();
 
-  if (
-    $("downloadSelectedBtn")
-  ) {
 
-    $("downloadSelectedBtn")
-      .onclick =
-      downloadSelected;
+      renderGallery();
+    };
 
-  }
 
+  /* ========================================================
+     DESCARGAR SELECCIONADAS ABAJO
+     ======================================================== */
+
+  $("downloadSelectedBtn")
+    .onclick =
+
+    downloadSelected;
+
+
+  /* ========================================================
+     DESCARGAR SELECCIONADAS ARRIBA
+     ======================================================== */
+
+  $("downloadSelectedTopBtn")
+    .onclick =
+
+    downloadSelected;
+
+
+  /* ========================================================
+     DESCARGAR TODA LOCALIDAD / MUNICIPIO
+     ======================================================== */
+
+  $("downloadAllScopeBtn")
+    .onclick =
+
+    downloadAllCurrentScope;
 }
 
 
