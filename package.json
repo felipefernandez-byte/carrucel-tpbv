@@ -7,9 +7,9 @@
     "build": "node scripts/build-catalog.mjs",
     "prepare-catalog": "node scripts/build-catalog.mjs"
   },
-  "engines": {
-    "node": ">=20 <25"
-  },
+ "engines": {
+  "node": "22.x"
+},
   "dependencies": {
     "qrcode": "^1.5.4"
   }
