@@ -66,24 +66,18 @@ function splitPipe(
 
 
 /* ==========================================================
-   FOTO ID DEL QR
+   FOTO ID
    ========================================================== */
 
 function photoIdFromPath() {
-
-  /*
-   * FORMA ACTUAL:
-   *
-   * /detalle.html?foto=FOTO-XXXXX
-   */
 
   const queryId =
     new URLSearchParams(
       location.search
     )
-    .get(
-      "foto"
-    );
+      .get(
+        "foto"
+      );
 
 
   if (
@@ -93,12 +87,6 @@ function photoIdFromPath() {
     return queryId.trim();
   }
 
-
-  /*
-   * Compatibilidad con:
-   *
-   * /foto/FOTO-XXXXX
-   */
 
   const parts =
     location.pathname
@@ -115,7 +103,9 @@ function photoIdFromPath() {
   if (
     parts[0] ===
       "foto"
+
     &&
+
     parts[1]
   ) {
 
@@ -149,7 +139,7 @@ function imageUrl(
 
 
 /* ==========================================================
-   URL DESCARGA ORIGINAL
+   URL DESCARGA
    ========================================================== */
 
 function downloadUrl(
@@ -237,7 +227,7 @@ function roleLabel(
 
   return (
     type ===
-    "coordinador"
+      "coordinador"
   )
 
     ?
@@ -263,7 +253,7 @@ function municipalityOf(
       photo?.municipio ||
       ""
     )
-    .trim();
+      .trim();
 
 
   if (own) {
@@ -280,7 +270,7 @@ function municipalityOf(
 
   return (
     values.length ===
-    1
+      1
   )
 
     ?
@@ -330,7 +320,7 @@ function primaryPlace(
 
 
 /* ==========================================================
-   ORDENAR SIN REPETIDOS
+   ORDENAR / QUITAR REPETIDOS
    ========================================================== */
 
 function uniqueSorted(
@@ -511,7 +501,7 @@ function setMainImage(
 
 
 /* ==========================================================
-   OBTENER TODAS LAS FOTOS DEL MUNICIPIO / LOCALIDAD
+   TODAS LAS FOTOS DE LOCALIDAD / MUNICIPIO
    ========================================================== */
 
 async function fetchAllGalleryPhotos(
@@ -536,16 +526,13 @@ async function fetchAllGalleryPhotos(
         action:
           "fotos",
 
-
         limit:
           "500",
-
 
         offset:
           String(
             offset
           ),
-
 
         ...params
       });
@@ -598,7 +585,7 @@ async function fetchAllGalleryPhotos(
 
 
 /* ==========================================================
-   NOMBRE PARA TARJETA
+   NOMBRE TARJETA
    ========================================================== */
 
 function cardPlace(
@@ -621,7 +608,7 @@ function cardPlace(
 
   if (
     locations.length ===
-    1
+      1
   ) {
 
     return locations[0];
@@ -642,7 +629,7 @@ function cardPlace(
 
 
 /* ==========================================================
-   SELECCIONAR / DESELECCIONAR FOTO
+   SELECCIONAR / DESELECCIONAR
    ========================================================== */
 
 function togglePhotoSelection(
@@ -678,7 +665,7 @@ function togglePhotoSelection(
 
 
 /* ==========================================================
-   ACTUALIZAR UI SELECCIÓN
+   ACTUALIZAR SELECCIÓN
    ========================================================== */
 
 function updateSelectionUI() {
@@ -686,8 +673,6 @@ function updateSelectionUI() {
   const count =
     selectedPhotoIds.size;
 
-
-  /* CONTADOR */
 
   if (
     $("selectedCount")
@@ -704,8 +689,6 @@ function updateSelectionUI() {
   }
 
 
-  /* BARRA INFERIOR */
-
   $("selectionDock")
     ?.classList
     .toggle(
@@ -713,11 +696,9 @@ function updateSelectionUI() {
       "hidden",
 
       count ===
-      0
+        0
     );
 
-
-  /* BOTÓN SUPERIOR */
 
   if (
     $("downloadSelectedTopBtn")
@@ -727,11 +708,9 @@ function updateSelectionUI() {
       .disabled =
 
       count ===
-      0;
+        0;
   }
 
-
-  /* TARJETAS */
 
   document
     .querySelectorAll(
@@ -774,7 +753,7 @@ function updateSelectionUI() {
 
 
 /* ==========================================================
-   CREAR TARJETA DE FOTO
+   CREAR TARJETA
    ========================================================== */
 
 function createGalleryCard(
@@ -816,7 +795,7 @@ function createGalleryCard(
 
 
   /* ========================================================
-     CHECK
+     INDICADOR DE SELECCIÓN
      ======================================================== */
 
   const selector =
@@ -867,7 +846,7 @@ function createGalleryCard(
 
 
   /* ========================================================
-     PIE
+     PIE DE TARJETA
      ======================================================== */
 
   const body =
@@ -894,6 +873,7 @@ function createGalleryCard(
 
   /* ========================================================
      BOTÓN DESCARGAR INDIVIDUAL
+     SOLO ICONO
      ======================================================== */
 
   const download =
@@ -912,13 +892,27 @@ function createGalleryCard(
     );
 
 
+  download.title =
+    "Descargar fotografía";
+
+
   download.setAttribute(
 
     "aria-label",
 
-    "Descargar esta fotografía"
+    "Descargar fotografía"
   );
 
+
+  /*
+   * AQUÍ ESTÁ EL CAMBIO:
+   *
+   * Ya NO tiene:
+   *
+   * <span>Descargar</span>
+   *
+   * Únicamente mostramos el ícono.
+   */
 
   download.innerHTML = `
 
@@ -927,24 +921,19 @@ function createGalleryCard(
         aria-hidden="true">
 
         <path
-          d="M12 4v10m0 0 3.5-3.5M12 14l-3.5-3.5M5 18v2h14v-2"
+          d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"
           fill="none"
           stroke="currentColor"
-          stroke-width="1.8"
+          stroke-width="1.9"
           stroke-linecap="round"
           stroke-linejoin="round"/>
 
       </svg>
-
-      <span>
-        Descargar
-      </span>
   `;
 
 
   /*
-   * Si se toca descargar,
-   * NO seleccionamos la tarjeta.
+   * Descargar NO selecciona la tarjeta.
    */
 
   download
@@ -952,9 +941,10 @@ function createGalleryCard(
 
       "click",
 
-      event =>
+      event => {
 
-        event.stopPropagation()
+        event.stopPropagation();
+      }
     );
 
 
@@ -981,7 +971,7 @@ function createGalleryCard(
 
 
   /* ========================================================
-     TODA LA FOTO SELECCIONA
+     TODA LA TARJETA SELECCIONA
      ======================================================== */
 
   card
@@ -990,11 +980,6 @@ function createGalleryCard(
       "click",
 
       event => {
-
-        /*
-         * Si tocó el botón descargar,
-         * no cambiar selección.
-         */
 
         if (
 
@@ -1017,7 +1002,7 @@ function createGalleryCard(
 
 
   /* ========================================================
-     ACCESIBILIDAD TECLADO
+     TECLADO
      ======================================================== */
 
   card
@@ -1069,10 +1054,6 @@ function renderGallery() {
     "";
 
 
-  /* ========================================================
-     VACÍA
-     ======================================================== */
-
   if (
     !filteredGalleryPhotos.length
   ) {
@@ -1102,10 +1083,6 @@ function renderGallery() {
     );
 
 
-  /* ========================================================
-     PINTAR
-     ======================================================== */
-
   const fragment =
     document
       .createDocumentFragment();
@@ -1120,15 +1097,15 @@ function renderGallery() {
 
     .forEach(
 
-      photo =>
+      photo => {
 
-        fragment
-          .append(
+        fragment.append(
 
-            createGalleryCard(
-              photo
-            )
+          createGalleryCard(
+            photo
           )
+        );
+      }
     );
 
 
@@ -1136,10 +1113,6 @@ function renderGallery() {
     fragment
   );
 
-
-  /* ========================================================
-     CARGAR MÁS
-     ======================================================== */
 
   const loadMore =
     $("loadMoreBtn");
@@ -1161,7 +1134,7 @@ function renderGallery() {
       "hidden",
 
       pending <=
-      0
+        0
     );
 
 
@@ -1172,7 +1145,7 @@ function renderGallery() {
     &&
 
     pending >
-    0
+      0
 
   ) {
 
@@ -1337,10 +1310,6 @@ async function loadGallery(
 
   try {
 
-    /* ======================================================
-       OBTENER TODAS
-       ====================================================== */
-
     const items =
       await fetchAllGalleryPhotos(
         params
@@ -1354,10 +1323,6 @@ async function loadGallery(
     filteredGalleryPhotos =
       items;
 
-
-    /* ======================================================
-       TÍTULO
-       ====================================================== */
 
     $("galleryTitle")
       .textContent =
@@ -1394,10 +1359,6 @@ async function loadGallery(
       } en ${scope}. Toca cualquier imagen para seleccionarla.`;
 
 
-    /* ======================================================
-       TEXTO BOTÓN DESCARGAR TODAS
-       ====================================================== */
-
     $("downloadAllScopeText")
       .textContent =
 
@@ -1419,10 +1380,6 @@ async function loadGallery(
 
     renderGallery();
 
-
-    /* ======================================================
-       SCROLL
-       ====================================================== */
 
     setTimeout(
 
@@ -1631,10 +1588,6 @@ function renderRelated() {
       );
 
 
-    /* ======================================================
-       MULTILOCALIDAD
-       ====================================================== */
-
     if (
       localities.length
     ) {
@@ -1664,7 +1617,7 @@ function renderRelated() {
         .textContent =
 
         localities.length ===
-        1
+          1
 
           ?
 
@@ -1689,10 +1642,6 @@ function renderRelated() {
         );
     }
 
-
-    /* ======================================================
-       MUNICIPIOS
-       ====================================================== */
 
     else {
 
@@ -1808,7 +1757,7 @@ function renderRelated() {
 
 
 /* ==========================================================
-   ZIP EN EL NAVEGADOR
+   ZIP
    ========================================================== */
 
 const CRC_TABLE =
@@ -1849,7 +1798,7 @@ const CRC_TABLE =
               ^
               (
                 c >>>
-                1
+                  1
               )
             )
 
@@ -1857,7 +1806,7 @@ const CRC_TABLE =
 
             (
               c >>>
-              1
+                1
             );
       }
 
@@ -1870,10 +1819,6 @@ const CRC_TABLE =
     return table;
   })();
 
-
-/* ==========================================================
-   CRC32
-   ========================================================== */
 
 function crc32(
   bytes
@@ -1893,7 +1838,7 @@ function crc32(
 
       (
         crc >>>
-        8
+          8
       )
 
       ^
@@ -1923,24 +1868,20 @@ function crc32(
 }
 
 
-/* ==========================================================
-   ENTEROS ZIP
-   ========================================================== */
-
 const u16 =
   value =>
 
     new Uint8Array([
 
       value &
-      255,
+        255,
 
       (
         value >>>
-        8
+          8
       )
       &
-      255
+        255
     ]);
 
 
@@ -1950,34 +1891,30 @@ const u32 =
     new Uint8Array([
 
       value &
-      255,
+        255,
 
       (
         value >>>
-        8
+          8
       )
       &
-      255,
+        255,
 
       (
         value >>>
-        16
+          16
       )
       &
-      255,
+        255,
 
       (
         value >>>
-        24
+          24
       )
       &
-      255
+        255
     ]);
 
-
-/* ==========================================================
-   UNIR BYTES
-   ========================================================== */
 
 function concatBytes(
   parts
@@ -2031,7 +1968,7 @@ function concatBytes(
 
 
 /* ==========================================================
-   NOMBRE SEGURO
+   NOMBRE DE ARCHIVO
    ========================================================== */
 
 function safeFilename(
@@ -2060,10 +1997,6 @@ function safeFilename(
     );
 }
 
-
-/* ==========================================================
-   EVITAR NOMBRES REPETIDOS
-   ========================================================== */
 
 function uniqueFilename(
 
@@ -2189,7 +2122,7 @@ function makeStoredZip(
     (
       now.getHours()
       <<
-      11
+        11
     )
 
     |
@@ -2197,7 +2130,7 @@ function makeStoredZip(
     (
       now.getMinutes()
       <<
-      5
+        5
     )
 
     |
@@ -2206,7 +2139,7 @@ function makeStoredZip(
 
       now.getSeconds()
       /
-      2
+        2
     );
 
 
@@ -2215,10 +2148,10 @@ function makeStoredZip(
     (
       (
         year -
-        1980
+          1980
       )
       <<
-      9
+        9
     )
 
     |
@@ -2227,10 +2160,10 @@ function makeStoredZip(
       (
         now.getMonth()
         +
-        1
+          1
       )
       <<
-      5
+        5
     )
 
     |
@@ -2258,10 +2191,6 @@ function makeStoredZip(
         data
       );
 
-
-    /* ======================================================
-       LOCAL
-       ====================================================== */
 
     const local =
       concatBytes([
@@ -2320,10 +2249,6 @@ function makeStoredZip(
       local
     );
 
-
-    /* ======================================================
-       CENTRAL
-       ====================================================== */
 
     const central =
       concatBytes([
@@ -2410,10 +2335,6 @@ function makeStoredZip(
   }
 
 
-  /* ========================================================
-     TAMAÑO CENTRAL
-     ======================================================== */
-
   const centralSize =
     centralParts.reduce(
 
@@ -2428,10 +2349,6 @@ function makeStoredZip(
       0
     );
 
-
-  /* ========================================================
-     FIN ZIP
-     ======================================================== */
 
   const end =
     concatBytes([
@@ -2484,7 +2401,6 @@ function makeStoredZip(
     {
 
       type:
-
         "application/zip"
     }
   );
@@ -2593,7 +2509,7 @@ async function fetchPhotoForZip(
 
 
 /* ==========================================================
-   DESCARGAR MUCHAS FOTOS COMO ZIP
+   DESCARGA MASIVA
    ========================================================== */
 
 async function downloadPhotosAsZip(
@@ -2616,10 +2532,6 @@ async function downloadPhotosAsZip(
     return;
   }
 
-
-  /* ========================================================
-     MENSAJE
-     ======================================================== */
 
   setStatus(
 
@@ -2645,19 +2557,9 @@ async function downloadPhotosAsZip(
     0;
 
 
-  /*
-   * 4 al mismo tiempo.
-   *
-   * Evita saturar el teléfono.
-   */
-
   const concurrency =
     4;
 
-
-  /* ========================================================
-     WORKER
-     ======================================================== */
 
   async function worker() {
 
@@ -2671,7 +2573,7 @@ async function downloadPhotosAsZip(
 
       if (
         index >=
-        photos.length
+          photos.length
       ) {
 
         return;
@@ -2737,8 +2639,8 @@ async function downloadPhotosAsZip(
         ||
 
         completed %
-        5 ===
-        0
+          5 ===
+          0
 
       ) {
 
@@ -2752,10 +2654,6 @@ async function downloadPhotosAsZip(
     }
   }
 
-
-  /* ========================================================
-     EJECUTAR WORKERS
-     ======================================================== */
 
   await Promise.all(
 
@@ -2778,10 +2676,6 @@ async function downloadPhotosAsZip(
   );
 
 
-  /* ========================================================
-     VALIDAR
-     ======================================================== */
-
   if (
     !files.length
   ) {
@@ -2792,10 +2686,6 @@ async function downloadPhotosAsZip(
     );
   }
 
-
-  /* ========================================================
-     CREAR ZIP
-     ======================================================== */
 
   setStatus(
 
@@ -3036,10 +2926,6 @@ async function init() {
     photoIdFromPath();
 
 
-  /* ========================================================
-     SIN FOTO ID
-     ======================================================== */
-
   if (
     !fotoId
   ) {
@@ -3066,10 +2952,6 @@ async function init() {
     return;
   }
 
-
-  /* ========================================================
-     OBTENER FOTO
-     ======================================================== */
 
   try {
 
@@ -3110,18 +2992,10 @@ async function init() {
   }
 
 
-  /* ========================================================
-     IMAGEN
-     ======================================================== */
-
   setMainImage(
     current
   );
 
-
-  /* ========================================================
-     INFORMACIÓN
-     ======================================================== */
 
   const municipality =
     municipalityOf(
@@ -3181,14 +3055,10 @@ async function init() {
     );
 
 
-  /* ========================================================
-     DESCRIPCIÓN
-     ======================================================== */
-
   if (
 
     current.tipo_asociacion ===
-    "EXACTA"
+      "EXACTA"
 
   ) {
 
@@ -3241,10 +3111,6 @@ async function init() {
   }
 
 
-  /* ========================================================
-     LOCALIDADES
-     ======================================================== */
-
   renderRelated();
 
 
@@ -3283,7 +3149,6 @@ async function init() {
 
   /* ========================================================
      SELECCIONAR TODAS
-     SIN LÍMITE DE 10
      ======================================================== */
 
   $("selectAllBtn")
@@ -3329,7 +3194,7 @@ async function init() {
 
 
   /* ========================================================
-     DESCARGAR SELECCIONADAS ABAJO
+     DESCARGAR SELECCIONADAS
      ======================================================== */
 
   $("downloadSelectedBtn")
@@ -3338,10 +3203,6 @@ async function init() {
     downloadSelected;
 
 
-  /* ========================================================
-     DESCARGAR SELECCIONADAS ARRIBA
-     ======================================================== */
-
   $("downloadSelectedTopBtn")
     .onclick =
 
@@ -3349,7 +3210,7 @@ async function init() {
 
 
   /* ========================================================
-     DESCARGAR TODA LOCALIDAD / MUNICIPIO
+     DESCARGAR TODO
      ======================================================== */
 
   $("downloadAllScopeBtn")
