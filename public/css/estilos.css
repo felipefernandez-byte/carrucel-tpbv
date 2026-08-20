@@ -1,0 +1,1892 @@
+
+:root{
+  --wine:#773357;
+  --wine2:#8c3e66;
+  --green:#3d4a39;
+  --cream:#f5f4f2;
+  --sand:#ebeade;
+  --sand2:#e4e3d6;
+  --ink:#22251f;
+  --muted:#6d7369;
+  --line:#d8d4ca;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,"Segoe UI",Arial,sans-serif}
+button,a{font:inherit}
+.hidden{display:none!important}
+
+.carousel-page{
+  min-height:100vh;
+  overflow:hidden;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 0%,rgba(119,51,87,.09),transparent 26%),
+    radial-gradient(circle at 96% 92%,rgba(61,74,57,.08),transparent 28%),
+    linear-gradient(180deg,#faf9f6 0%,#ebeade 100%);
+}
+
+.event-shell{
+  height:100vh;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) 8px;
+  gap:12px;
+  padding:14px 18px 0;
+}
+
+/* Header más limpio e institucional */
+.event-header{
+  min-height:102px;
+  display:grid;
+  grid-template-columns:minmax(250px,340px) minmax(0,1fr) minmax(210px,290px);
+  gap:22px;
+  align-items:center;
+  padding:12px 24px;
+  border-radius:24px;
+  border:1px solid rgba(119,51,87,.12);
+  border-top:5px solid var(--wine);
+  background:rgba(255,255,255,.91);
+  box-shadow:0 12px 34px rgba(55,45,48,.08);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.brand img{
+  display:block;
+  width:100%;
+  height:78px;
+  object-fit:contain;
+}
+.brand-morelos{justify-content:flex-start}
+.brand-tpbv{justify-content:flex-end}
+.brand-tpbv img{max-height:66px}
+
+.event-title{
+  text-align:center;
+  min-width:0;
+}
+.event-title span{
+  display:block;
+  color:var(--green);
+  font-weight:900;
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.event-title h1{
+  margin:0;
+  color:var(--wine);
+  font-size:clamp(34px,3.1vw,54px);
+  line-height:1;
+  letter-spacing:-.045em;
+}
+
+/* Carrusel */
+.carousel-stage{
+  position:relative;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 72px 30px;
+}
+.carousel-visual{
+  width:min(1420px,100%);
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(130px,.42fr) minmax(560px,1.9fr) minmax(130px,.42fr);
+  align-items:center;
+  gap:0;
+  perspective:1600px;
+}
+
+.center-photo{
+  --current-photo:none;
+  position:relative;
+  z-index:4;
+  height:min(68vh,710px);
+  min-height:450px;
+  overflow:hidden;
+  border-radius:30px;
+  background:#dcd9d1;
+  border:1px solid rgba(61,74,57,.13);
+  box-shadow:0 28px 62px rgba(55,47,49,.22);
+  cursor:pointer;
+  transform:translateZ(75px);
+  isolation:isolate;
+}
+.center-photo::before{
+  content:"";
+  position:absolute;
+  inset:-35px;
+  z-index:-2;
+  background-image:var(--current-photo);
+  background-size:cover;
+  background-position:center;
+  filter:blur(35px) saturate(.80);
+  transform:scale(1.12);
+  opacity:.72;
+}
+.center-photo::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:rgba(25,28,24,.12);
+  pointer-events:none;
+}
+.center-photo.enter{
+  animation:enterPhoto .48s cubic-bezier(.2,.75,.2,1);
+}
+@keyframes enterPhoto{
+  from{opacity:.83;transform:translateZ(35px) scale(.97)}
+  to{opacity:1;transform:translateZ(75px) scale(1)}
+}
+.center-photo>img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  background:transparent;
+  position:relative;
+  z-index:1;
+}
+.photo-gradient{
+  position:absolute;
+  z-index:2;
+  inset:auto 0 0;
+  height:35%;
+  background:linear-gradient(transparent,rgba(15,16,14,.76));
+  pointer-events:none;
+}
+.photo-info{
+  position:absolute;
+  z-index:3;
+  left:28px;
+  right:28px;
+  bottom:24px;
+  color:#fff;
+  text-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.photo-info h2{
+  margin:0;
+  font-size:clamp(31px,3.4vw,57px);
+  letter-spacing:-.045em;
+  line-height:1;
+}
+.photo-info p{
+  margin:8px 0 0;
+  font-size:16px;
+  font-weight:650;
+  color:rgba(255,255,255,.9);
+}
+
+.side-photo{
+  position:relative;
+  height:50%;
+  min-height:275px;
+  border:0;
+  padding:0;
+  overflow:hidden;
+  cursor:pointer;
+  background:#d7d5ce;
+  opacity:.56;
+  filter:blur(2px) saturate(.72);
+  box-shadow:0 18px 38px rgba(40,35,37,.12);
+  transition:.25s ease;
+}
+.side-photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.side-photo::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(245,244,242,.20);
+}
+.side-photo:hover{
+  opacity:.74;
+  filter:blur(.9px) saturate(.86);
+}
+.side-left{
+  border-radius:24px 0 0 24px;
+  transform:translateX(35px) rotateY(24deg) scale(.87);
+  transform-origin:right center;
+}
+.side-right{
+  border-radius:0 24px 24px 0;
+  transform:translateX(-35px) rotateY(-24deg) scale(.87);
+  transform-origin:left center;
+}
+
+/* Flechas flotantes a los costados */
+.nav-arrow{
+  position:absolute;
+  z-index:10;
+  top:50%;
+  transform:translateY(-50%);
+  width:54px;
+  height:54px;
+  border:0;
+  border-radius:50%;
+  background:var(--wine);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(119,51,87,.24);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  transition:.2s ease;
+}
+.nav-arrow:hover{
+  background:var(--wine2);
+  transform:translateY(-50%) scale(1.06);
+}
+.nav-arrow span{
+  font-size:42px;
+  line-height:.7;
+  transform:translateY(-2px);
+}
+.nav-prev{left:8px}
+.nav-next{right:8px}
+
+/* QR pequeño abajo a la derecha */
+.qr-corner-card{
+  position:absolute;
+  z-index:12;
+  right:18px;
+  bottom:20px;
+  width:178px;
+  padding:10px;
+  border-radius:18px;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(119,51,87,.10);
+  box-shadow:0 13px 30px rgba(40,34,36,.14);
+  display:grid;
+  grid-template-columns:1fr 82px;
+  grid-template-areas:
+    "copy qr"
+    "id qr";
+  gap:5px 8px;
+  align-items:center;
+}
+.qr-copy{grid-area:copy}
+.qr-copy strong{
+  display:block;
+  color:var(--wine);
+  font-size:11px;
+  line-height:1.15;
+}
+.qr-copy span{
+  display:block;
+  color:var(--muted);
+  font-size:8.5px;
+  line-height:1.25;
+  margin-top:3px;
+}
+.qr-box{
+  grid-area:qr;
+  width:82px;
+  height:82px;
+  padding:5px;
+  border-radius:11px;
+  background:#fff;
+}
+.qr-box img{display:block;width:100%;height:100%}
+.qr-id{
+  grid-area:id;
+  min-width:0;
+  font-size:7.5px;
+  font-weight:900;
+  color:#73776e;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Feedback al hacer clic en la foto */
+.pause-feedback{
+  position:absolute;
+  z-index:8;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(.90);
+  min-width:142px;
+  padding:15px 18px;
+  border-radius:18px;
+  background:rgba(20,22,19,.72);
+  color:white;
+  text-align:center;
+  backdrop-filter:blur(12px);
+  opacity:0;
+  pointer-events:none;
+  transition:.18s ease;
+}
+.pause-feedback.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+}
+.pause-feedback span{
+  display:block;
+  font-size:28px;
+  margin-bottom:5px;
+}
+.pause-feedback strong{font-size:14px}
+.center-photo.is-paused{
+  box-shadow:
+    0 0 0 3px rgba(119,51,87,.16),
+    0 28px 62px rgba(55,47,49,.22);
+}
+
+.image-error{
+  position:absolute;
+  inset:0;
+  z-index:15;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  color:#fff;
+  background:#31332e;
+}
+.image-error a{
+  color:white;
+  text-decoration:none;
+  background:var(--wine);
+  padding:10px 14px;
+  border-radius:11px;
+}
+
+/* Barra única en toda la parte inferior */
+.progress-bottom{
+  width:100%;
+  height:8px;
+  border-radius:999px 999px 0 0;
+  overflow:hidden;
+  background:#d7d3c8;
+}
+.progress-bar{
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,var(--wine),#b77896);
+}
+
+/* Página QR */
+.detail-page{
+  margin:0;
+  min-height:100vh;
+  background:linear-gradient(180deg,#f8f7f3,var(--sand));
+  color:var(--ink);
+}
+.detail-shell{max-width:1080px;margin:auto;padding:28px 18px 50px}
+.mobile-header{
+  padding:18px 0 22px;
+  text-align:center;
+}
+.mobile-header .eyebrow{
+  color:var(--wine);
+  text-transform:uppercase;
+  font-size:11px;
+  letter-spacing:.17em;
+  font-weight:900;
+}
+.mobile-header h1{
+  margin:7px 0 5px;
+  font-size:40px;
+  letter-spacing:-.04em;
+}
+.mobile-header p{margin:0;color:var(--muted)}
+.selected-card{
+  display:grid;
+  grid-template-columns:minmax(0,1.4fr) minmax(270px,.6fr);
+  overflow:hidden;
+  border-radius:25px;
+  background:white;
+  box-shadow:0 15px 42px rgba(30,30,20,.08);
+}
+.selected-card>img{
+  width:100%;
+  height:440px;
+  object-fit:contain;
+  background:#242521;
+}
+.selected-copy{
+  padding:26px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.selected-copy h2{margin:10px 0 6px;font-size:30px}
+.selected-copy p{margin:0 0 18px;color:var(--muted)}
+.badge{
+  display:inline-flex;
+  align-self:flex-start;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(119,51,87,.10);
+  color:var(--wine);
+  font-size:11px;
+  font-weight:900;
+}
+.action-row{display:flex;gap:9px;flex-wrap:wrap}
+.primary-link,.secondary-link{
+  text-decoration:none;
+  padding:11px 14px;
+  border-radius:11px;
+  font-weight:800;
+}
+.primary-link{background:var(--wine);color:white}
+.secondary-link{background:#ebe8df;color:var(--ink)}
+.chooser{padding:25px 4px 8px}
+.chooser h2{margin:0 0 7px;font-size:27px}
+.chooser p{color:var(--muted);line-height:1.5}
+.choice-grid{display:flex;flex-wrap:wrap;gap:8px}
+.choice-grid button{
+  border:1px solid var(--line);
+  background:white;
+  color:var(--ink);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:700;
+}
+.choice-grid button.municipality{background:var(--green);color:white;border-color:var(--green)}
+.gallery-section{
+  margin-top:22px;
+  padding:22px;
+  border-radius:22px;
+  background:rgba(255,255,255,.58);
+}
+.gallery-head{display:flex;justify-content:space-between;align-items:end;gap:15px}
+.gallery-head h2{margin:4px 0 0}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:15px}
+.gallery-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:16px;
+  background:white;
+  box-shadow:0 7px 18px rgba(0,0,0,.06);
+}
+.gallery-card img{width:100%;height:190px;object-fit:cover;display:block;background:#222}
+.gallery-copy{padding:11px}
+.gallery-copy strong{display:block;font-size:13px}
+.gallery-copy span{font-size:11px;color:var(--muted)}
+.gallery-mini-actions{display:flex;gap:6px;margin-top:9px}
+.gallery-mini-actions a{
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  border-radius:8px;
+  padding:7px;
+  font-size:11px;
+  font-weight:800;
+}
+.mini-download{background:var(--wine);color:#fff}
+.mini-open{background:#ebe8df;color:var(--ink)}
+.select-photo{
+  position:absolute;
+  right:9px;
+  top:9px;
+  z-index:4;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:white;
+  display:grid;
+  place-items:center;
+  box-shadow:0 4px 12px rgba(0,0,0,.14);
+}
+.select-photo input{position:absolute;opacity:0}
+.select-photo span{font-weight:900;color:#bbb}
+.select-photo input:checked + span{color:var(--wine)}
+.gallery-card.selected{outline:3px solid var(--wine)}
+.download-toolbar{
+  margin-top:14px;
+  padding:13px;
+  border-radius:15px;
+  background:white;
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:center;
+}
+.selection-info{display:flex;flex-direction:column}
+.selection-info span{color:var(--muted);font-size:11px}
+.download-actions{display:flex;flex-wrap:wrap;gap:7px}
+.download-actions button{
+  border:0;
+  padding:9px 11px;
+  border-radius:9px;
+  cursor:pointer;
+  font-weight:800;
+}
+.soft-button{background:#ebe8df}
+.primary-button{background:var(--wine);color:white}
+.primary-button:disabled{opacity:.4;cursor:not-allowed}
+.dark-button{background:var(--green);color:white}
+.download-status{padding:10px;margin-top:10px;border-radius:10px;background:white}
+.detail-footer{text-align:center;color:var(--muted);font-size:11px;padding-top:26px}
+.hidden{display:none!important}
+
+@media(max-width:1100px){
+  .event-header{grid-template-columns:250px minmax(0,1fr) 220px}
+  .carousel-visual{grid-template-columns:110px minmax(480px,1fr) 110px}
+}
+@media(max-width:850px){
+  .carousel-page{overflow:auto}
+  .event-shell{height:auto;min-height:100vh}
+  .event-header{grid-template-columns:1fr;text-align:center}
+  .brand{justify-content:center}
+  .brand img{max-width:410px}
+  .carousel-stage{min-height:650px;padding:10px 45px 145px}
+  .carousel-visual{grid-template-columns:42px minmax(0,1fr) 42px}
+  .center-photo{min-height:520px}
+  .nav-arrow{width:44px;height:44px}
+  .qr-corner-card{right:50%;transform:translateX(50%);bottom:18px}
+  .selected-card{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* ==========================================================
+   TPBV CARRUSEL v3.1 - AJUSTE VISUAL MINIMALISTA
+   ========================================================== */
+
+/* Fondo más limpio, sin efectos decorativos innecesarios */
+.carousel-page{
+  background:#f5f4f2;
+}
+
+/* El header ocupa SIEMPRE todo el ancho de la pantalla */
+.event-shell{
+  padding:0 18px 0;
+  gap:10px;
+}
+
+.event-header{
+  width:calc(100% + 36px);
+  margin:0 -18px;
+  min-height:98px;
+  padding:11px 36px;
+
+  border:0;
+  border-top:4px solid var(--wine);
+  border-bottom:1px solid rgba(61,74,57,.10);
+  border-radius:0;
+
+  background:#ffffff;
+  box-shadow:0 5px 18px rgba(45,40,42,.055);
+
+  grid-template-columns:minmax(250px,340px) minmax(0,1fr) minmax(210px,285px);
+  gap:24px;
+}
+
+.brand img{
+  height:72px;
+}
+
+.brand-tpbv img{
+  max-height:61px;
+}
+
+.event-title span{
+  margin-bottom:5px;
+  font-size:10px;
+  letter-spacing:.16em;
+  color:var(--green);
+}
+
+.event-title h1{
+  font-size:clamp(32px,2.85vw,50px);
+  font-weight:800;
+  letter-spacing:-.04em;
+}
+
+/* Un poco más de aire entre header y carrusel */
+.carousel-stage{
+  padding-top:12px;
+  padding-bottom:30px;
+}
+
+/* Foto central: sombra más discreta */
+.center-photo{
+  border:0;
+  box-shadow:0 18px 44px rgba(45,40,42,.16);
+}
+
+/* Laterales más suaves y menos pesadas visualmente */
+.side-photo{
+  opacity:.46;
+  filter:blur(2.2px) saturate(.70);
+  box-shadow:none;
+}
+.side-photo:hover{
+  opacity:.66;
+  filter:blur(1px) saturate(.82);
+}
+
+/* Flechas minimalistas: ya no son círculos vino sólidos */
+.nav-arrow{
+  width:48px;
+  height:48px;
+
+  border:1px solid rgba(119,51,87,.20);
+  border-radius:50%;
+
+  background:rgba(255,255,255,.90);
+  color:var(--wine);
+
+  box-shadow:0 5px 16px rgba(45,40,42,.08);
+  backdrop-filter:blur(8px);
+
+  transition:
+    background .18s ease,
+    color .18s ease,
+    border-color .18s ease,
+    transform .18s ease;
+}
+
+.nav-arrow:hover{
+  background:var(--wine);
+  color:#fff;
+  border-color:var(--wine);
+  transform:translateY(-50%) scale(1.04);
+}
+
+.nav-arrow:active{
+  transform:translateY(-50%) scale(.97);
+}
+
+.nav-arrow span{
+  font-size:36px;
+  font-weight:300;
+  line-height:.75;
+  transform:translateY(-2px);
+}
+
+/* Acercamos las flechas al conjunto del carrusel */
+.nav-prev{
+  left:clamp(24px,6.5vw,112px);
+}
+.nav-next{
+  right:clamp(24px,6.5vw,112px);
+}
+
+/* QR un poco más grande, pero limpio */
+.qr-corner-card{
+  right:24px;
+  bottom:24px;
+
+  width:246px;
+  padding:13px 14px;
+
+  grid-template-columns:minmax(0,1fr) 112px;
+  grid-template-areas:"copy qr";
+  gap:14px;
+
+  border:1px solid rgba(61,74,57,.10);
+  border-radius:14px;
+
+  background:rgba(255,255,255,.96);
+  box-shadow:0 8px 22px rgba(45,40,42,.10);
+}
+
+.qr-copy{
+  grid-area:copy;
+  align-self:center;
+}
+
+.qr-copy strong{
+  display:block;
+  margin:0 0 6px;
+
+  color:var(--wine);
+  font-size:15px;
+  font-weight:800;
+  line-height:1.12;
+}
+
+.qr-copy span{
+  display:block;
+  margin:0;
+
+  color:#646a62;
+  font-size:11px;
+  line-height:1.35;
+}
+
+.qr-box{
+  grid-area:qr;
+
+  width:112px;
+  height:112px;
+  padding:6px;
+
+  border:1px solid #ece9e3;
+  border-radius:10px;
+  background:#fff;
+}
+
+/* El id técnico ya no se muestra en la tarjeta */
+.qr-id{
+  display:none;
+}
+
+/* Barra inferior realmente de extremo a extremo */
+.progress-bottom{
+  width:calc(100% + 36px);
+  height:5px;
+  margin:0 -18px;
+
+  border-radius:0;
+  background:#dedbd3;
+}
+
+.progress-bar{
+  background:var(--wine);
+}
+
+/* Responsive del nuevo header / QR */
+@media(max-width:1100px){
+  .event-header{
+    grid-template-columns:230px minmax(0,1fr) 205px;
+    padding-left:24px;
+    padding-right:24px;
+  }
+
+  .qr-corner-card{
+    width:230px;
+    grid-template-columns:minmax(0,1fr) 104px;
+  }
+
+  .qr-box{
+    width:104px;
+    height:104px;
+  }
+}
+
+@media(max-width:850px){
+  .event-shell{
+    padding:0 10px;
+  }
+
+  .event-header{
+    width:calc(100% + 20px);
+    margin:0 -10px;
+    grid-template-columns:1fr;
+    padding:14px 18px;
+  }
+
+  .progress-bottom{
+    width:calc(100% + 20px);
+    margin:0 -10px;
+  }
+
+  .nav-prev{left:12px}
+  .nav-next{right:12px}
+
+  .qr-corner-card{
+    right:50%;
+    bottom:18px;
+    transform:translateX(50%);
+    width:238px;
+  }
+}
+
+
+/* ==========================================================
+   TPBV v3.2 - EXPERIENCIA MÓVIL
+   Tipografías configuradas por nombre local:
+   Karol Sans / Quetzalli Sans / Twogether Sans.
+   ========================================================== */
+
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans Regular"),local("KarolSans-Regular");
+  font-weight:400;
+}
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans SemiBold"),local("KarolSans-SemiBold");
+  font-weight:600;
+}
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans Bold"),local("KarolSans-Bold");
+  font-weight:700;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Regular"),local("QuetzalliSans-Regular");
+  font-weight:400;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Bold"),local("QuetzalliSans-Bold");
+  font-weight:700;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Black"),local("QuetzalliSans-Black");
+  font-weight:900;
+}
+@font-face{
+  font-family:"Twogether Sans";
+  src:local("Twogether Sans Medium"),local("TwogetherSans-Medium");
+  font-weight:500;
+}
+@font-face{
+  font-family:"Twogether Sans";
+  src:local("Twogether Sans Bold"),local("TwogetherSans-Bold");
+  font-weight:700;
+}
+
+.mobile-v32{
+  --mobile-wine:#773357;
+  --mobile-green:#3d4a39;
+  --mobile-bg:#f5f4f2;
+  --mobile-card:#ffffff;
+  --mobile-muted:#72776f;
+  --mobile-border:#e4e1da;
+
+  font-family:"Karol Sans","Segoe UI",Arial,sans-serif;
+  background:var(--mobile-bg);
+}
+
+.mobile-v32 .detail-shell{
+  max-width:760px;
+  margin:0 auto;
+  padding:0 16px calc(92px + env(safe-area-inset-bottom));
+}
+
+.mobile-brand-header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:84px;
+  margin:0 -16px;
+  padding:14px 20px 13px;
+  background:#fff;
+  border-bottom:1px solid var(--mobile-border);
+}
+
+.mobile-tpbv-logo{
+  display:block;
+  width:min(240px,58vw);
+  max-height:54px;
+  object-fit:contain;
+}
+
+.mobile-intro{
+  padding:30px 2px 20px;
+}
+
+.mobile-eyebrow{
+  font-family:"Twogether Sans","Segoe UI",sans-serif;
+  color:var(--mobile-wine);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.16em;
+}
+
+.mobile-intro h1{
+  margin:5px 0 6px;
+  font-family:"Quetzalli Sans","Trebuchet MS",sans-serif;
+  font-size:clamp(34px,10vw,48px);
+  font-weight:900;
+  line-height:.98;
+  letter-spacing:-.045em;
+  color:#20231f;
+}
+
+.mobile-intro p{
+  margin:0;
+  color:var(--mobile-muted);
+  font-size:14px;
+  line-height:1.5;
+}
+
+.selected-photo-card{
+  overflow:hidden;
+  border:1px solid var(--mobile-border);
+  border-radius:22px;
+  background:#fff;
+  box-shadow:0 8px 28px rgba(42,38,39,.055);
+}
+
+.selected-photo-frame{
+  display:grid;
+  place-items:center;
+  min-height:280px;
+  max-height:68vh;
+  background:#e9e7e1;
+}
+
+.selected-photo-frame img{
+  display:block;
+  width:100%;
+  max-height:68vh;
+  object-fit:contain;
+}
+
+.selected-photo-content{
+  padding:20px;
+}
+
+.selected-place-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.selected-context{
+  display:block;
+  margin-bottom:5px;
+  color:var(--mobile-muted);
+  font-size:11px;
+  font-weight:600;
+}
+
+.selected-photo-content h2{
+  margin:0;
+  font-family:"Quetzalli Sans","Trebuchet MS",sans-serif;
+  color:#20231f;
+  font-size:30px;
+  font-weight:900;
+  line-height:1.03;
+  letter-spacing:-.035em;
+}
+
+.selected-role{
+  flex:0 0 auto;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#f1ecef;
+  color:var(--mobile-wine);
+  font-family:"Twogether Sans","Segoe UI",sans-serif;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+}
+
+.selected-description{
+  margin:12px 0 18px;
+  color:var(--mobile-muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.download-main-btn{
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  width:100%;
+  padding:12px 16px;
+  border-radius:13px;
+  background:var(--mobile-wine);
+  color:#fff;
+  text-decoration:none;
+  font-weight:700;
+}
+
+.download-main-btn svg{
+  width:20px;
+  height:20px;
+}
+
+.related-section,
+.gallery-section{
+  margin-top:28px;
+}
+
+.related-section{
+  padding:22px;
+  border:1px solid var(--mobile-border);
+  border-radius:20px;
+  background:#fff;
+}
+
+.section-title-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.section-title-row h2{
+  margin:5px 0 0;
+  font-family:"Quetzalli Sans","Trebuchet MS",sans-serif;
+  color:#232620;
+  font-size:25px;
+  line-height:1.08;
+  letter-spacing:-.03em;
+}
+
+.related-count,
+.gallery-total{
+  flex:0 0 auto;
+  min-width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  padding:0 9px;
+  border-radius:999px;
+  background:#f1ecef;
+  color:var(--mobile-wine);
+  font-weight:800;
+  font-size:12px;
+}
+
+.related-count:empty{display:none}
+
+.section-help{
+  margin:10px 0 17px;
+  color:var(--mobile-muted);
+  font-size:13px;
+  line-height:1.5;
+}
+
+.locality-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+}
+
+.locality-choice{
+  width:100%;
+  min-height:54px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) 20px;
+  gap:9px;
+  align-items:center;
+  padding:9px 12px;
+  border:1px solid var(--mobile-border);
+  border-radius:13px;
+  background:#faf9f6;
+  color:#2b2f29;
+  text-align:left;
+  cursor:pointer;
+}
+
+.locality-choice:hover,
+.locality-choice:focus-visible{
+  border-color:rgba(119,51,87,.32);
+  background:#fff;
+  outline:none;
+}
+
+.locality-choice.current{
+  border-color:rgba(119,51,87,.25);
+  background:#f7f1f4;
+}
+
+.locality-choice-icon{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:#fff;
+  color:var(--mobile-green);
+}
+
+.locality-choice-icon svg{
+  width:19px;
+  height:19px;
+}
+
+.locality-choice>span:nth-child(2){
+  font-size:13px;
+  font-weight:700;
+  line-height:1.25;
+}
+
+.locality-choice-arrow{
+  color:#999d96;
+  font-size:24px;
+  text-align:right;
+}
+
+.municipality-explore-btn{
+  width:100%;
+  min-height:64px;
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr) 22px;
+  gap:11px;
+  align-items:center;
+  padding:11px 13px;
+  border:0;
+  border-radius:14px;
+  background:var(--mobile-green);
+  color:#fff;
+  text-align:left;
+  cursor:pointer;
+}
+
+.municipality-icon{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:11px;
+  background:rgba(255,255,255,.12);
+}
+
+.municipality-icon svg{
+  width:22px;
+  height:22px;
+}
+
+.municipality-explore-btn small{
+  display:block;
+  margin-bottom:2px;
+  opacity:.72;
+  font-family:"Twogether Sans","Segoe UI",sans-serif;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.12em;
+}
+
+.municipality-explore-btn strong{
+  display:block;
+  font-size:14px;
+}
+
+.municipality-arrow{
+  font-size:27px;
+  opacity:.8;
+}
+
+.gallery-section{
+  padding:0;
+  border:0;
+  background:transparent;
+}
+
+.gallery-title-row{
+  padding:0 2px;
+}
+
+.explore-controls{
+  position:sticky;
+  top:8px;
+  z-index:15;
+  margin:14px 0;
+  padding:10px;
+  border:1px solid rgba(228,225,218,.88);
+  border-radius:16px;
+  background:rgba(245,244,242,.94);
+  backdrop-filter:blur(14px);
+}
+
+.gallery-search{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:0 12px;
+  border:1px solid var(--mobile-border);
+  border-radius:12px;
+  background:#fff;
+  color:#8a8e87;
+}
+
+.gallery-search svg{
+  flex:0 0 auto;
+  width:19px;
+  height:19px;
+}
+
+.gallery-search input{
+  width:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:#272b26;
+  font:inherit;
+  font-size:13px;
+}
+
+.selection-controls{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:11px;
+  margin-top:8px;
+}
+
+.text-action-btn{
+  border:0;
+  padding:5px 2px;
+  background:transparent;
+  color:var(--mobile-wine);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.selection-divider{
+  width:1px;
+  height:12px;
+  background:#d8d5ce;
+}
+
+.mobile-v32 .gallery{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:0;
+}
+
+.mobile-v32 .gallery-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--mobile-border);
+  border-radius:15px;
+  background:#fff;
+  box-shadow:none;
+}
+
+.mobile-v32 .gallery-card.selected{
+  outline:2px solid var(--mobile-wine);
+  outline-offset:-2px;
+}
+
+.mobile-v32 .gallery-card img{
+  width:100%;
+  aspect-ratio:1/1;
+  height:auto;
+  object-fit:cover;
+  background:#e9e7e1;
+}
+
+.gallery-card-body{
+  min-height:48px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 34px;
+  gap:8px;
+  align-items:center;
+  padding:8px 9px;
+}
+
+.gallery-card-body strong{
+  overflow:hidden;
+  color:#353934;
+  font-size:11px;
+  line-height:1.25;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.gallery-download{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  border-radius:9px;
+  background:#f1ecef;
+  color:var(--mobile-wine);
+}
+
+.gallery-download svg{
+  width:18px;
+  height:18px;
+}
+
+.mobile-v32 .select-photo{
+  top:8px;
+  right:8px;
+  width:30px;
+  height:30px;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 3px 10px rgba(0,0,0,.10);
+}
+
+.mobile-v32 .select-photo span{
+  font-size:14px;
+  color:#c0c3be;
+}
+
+.mobile-v32 .select-photo input:checked + span{
+  color:var(--mobile-wine);
+}
+
+.gallery-empty{
+  padding:24px 14px;
+  text-align:center;
+  color:var(--mobile-muted);
+  font-size:13px;
+}
+
+.selection-dock{
+  position:fixed;
+  z-index:40;
+  left:50%;
+  bottom:calc(12px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:min(calc(100% - 24px),700px);
+  min-height:66px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:10px 10px 10px 15px;
+  border:1px solid rgba(61,74,57,.12);
+  border-radius:16px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 12px 32px rgba(38,35,36,.16);
+  backdrop-filter:blur(16px);
+}
+
+.selection-dock strong{
+  display:block;
+  color:#2b2f29;
+  font-size:13px;
+}
+
+.selection-dock span{
+  display:block;
+  margin-top:2px;
+  color:var(--mobile-muted);
+  font-size:9px;
+}
+
+.selection-dock button{
+  min-height:44px;
+  border:0;
+  border-radius:11px;
+  padding:0 16px;
+  background:var(--mobile-wine);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.mobile-v32 .download-status{
+  position:fixed;
+  z-index:50;
+  left:50%;
+  top:14px;
+  transform:translateX(-50%);
+  width:min(calc(100% - 30px),500px);
+  padding:11px 14px;
+  border:1px solid var(--mobile-border);
+  border-radius:12px;
+  background:#fff;
+  color:#373b35;
+  box-shadow:0 8px 24px rgba(0,0,0,.11);
+  text-align:center;
+  font-size:12px;
+}
+
+.mobile-footer{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  padding:38px 0 10px;
+  color:#8b8f88;
+  font-size:10px;
+}
+
+.mobile-footer img{
+  width:115px;
+  max-height:34px;
+  object-fit:contain;
+  opacity:.78;
+}
+
+@media(min-width:600px){
+  .mobile-v32 .detail-shell{
+    padding-left:24px;
+    padding-right:24px;
+  }
+
+  .mobile-brand-header{
+    margin-left:-24px;
+    margin-right:-24px;
+  }
+
+  .locality-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  .mobile-v32 .gallery{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+}
+
+
+/* ==========================================================
+   TPBV v3.3 - TIPOGRAFÍAS DEL PAQUETE DEL USUARIO
+   Los archivos se preparan localmente con preparar_fuentes.ps1.
+   ========================================================== */
+
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans Regular"),
+      url("/fonts/KarolSans-Regular.otf") format("opentype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans SemiBold"),
+      url("/fonts/KarolSans-SemiBold.otf") format("opentype");
+  font-weight:600;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Karol Sans";
+  src:local("Karol Sans Bold"),
+      url("/fonts/KarolSans-Bold.otf") format("opentype");
+  font-weight:700;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Karol Sans Black";
+  src:local("Karol Sans Black"),
+      url("/fonts/KarolSans-Black.otf") format("opentype");
+  font-weight:900;
+  font-style:normal;
+  font-display:swap;
+}
+
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Regular"),
+      url("/fonts/QuetzalliSans-Regular.otf") format("opentype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Medium"),
+      url("/fonts/QuetzalliSans-Medium.otf") format("opentype");
+  font-weight:500;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Bold"),
+      url("/fonts/QuetzalliSans-Bold.otf") format("opentype");
+  font-weight:700;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Quetzalli Sans";
+  src:local("Quetzalli Sans Black"),
+      url("/fonts/QuetzalliSans-Black.otf") format("opentype");
+  font-weight:900;
+  font-style:normal;
+  font-display:swap;
+}
+
+@font-face{
+  font-family:"Twogether Sans";
+  src:local("Twogether Sans Regular"),
+      url("/fonts/TwogetherSans-Regular.otf") format("opentype");
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Twogether Sans";
+  src:local("Twogether Sans Medium"),
+      url("/fonts/TwogetherSans-Medium.otf") format("opentype");
+  font-weight:500;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Twogether Sans";
+  src:local("Twogether Sans Bold"),
+      url("/fonts/TwogetherSans-Bold.otf") format("opentype");
+  font-weight:700;
+  font-style:normal;
+  font-display:swap;
+}
+
+/* Combinación institucional */
+body,
+button,
+input,
+a{
+  font-family:"Karol Sans","Segoe UI",Arial,sans-serif;
+}
+
+.event-title h1,
+.photo-info h2,
+.mobile-intro h1,
+.selected-photo-content h2,
+.section-title-row h2{
+  font-family:"Quetzalli Sans","Karol Sans","Segoe UI",sans-serif;
+}
+
+.event-title span,
+.mobile-eyebrow,
+.selected-role,
+.municipality-explore-btn small{
+  font-family:"Twogether Sans","Karol Sans","Segoe UI",sans-serif;
+}
+
+.image-load-error{
+  opacity:.30;
+  background:#ebe8e0;
+}
+
+
+/* ==========================================================
+   TPBV v3.6
+   SOLO CARRUSEL / ANIMACION VISUAL BASADA EN LA REFERENCIA
+   DE STITCH PROPORCIONADA POR EL USUARIO.
+   El header, QR, colores institucionales y resto del sitio
+   permanecen como estaban.
+   ========================================================== */
+
+/*
+ * Concepto Stitch:
+ * perspective: 1200px;
+ * transition: all .8s cubic-bezier(.25,.8,.25,1);
+ * active scale(1)
+ * prev/next opacity .7 + scale(.85) + translateZ(-100px)
+ * blur(2px)
+ */
+.carousel-stage{
+  overflow:hidden;
+}
+
+.carousel-visual{
+  position:relative;
+  display:block;
+
+  width:min(1200px,100%);
+  height:min(66vh,610px);
+  min-height:500px;
+
+  perspective:1200px;
+  transform-style:preserve-3d;
+}
+
+/* Las tres imágenes comparten el mismo lienzo 3D */
+.carousel-visual .center-photo,
+.carousel-visual .side-photo{
+  position:absolute;
+  top:50%;
+  left:50%;
+
+  width:min(800px,66vw);
+  height:min(500px,55vh);
+  min-height:0;
+
+  margin:0;
+
+  border-radius:8px;
+  transform-origin:center center;
+
+  transition:
+    transform .8s cubic-bezier(.25,.8,.25,1),
+    opacity .8s cubic-bezier(.25,.8,.25,1),
+    filter .8s cubic-bezier(.25,.8,.25,1),
+    box-shadow .8s cubic-bezier(.25,.8,.25,1);
+
+  will-change:transform,opacity,filter;
+}
+
+/* FOTO ACTUAL */
+.carousel-visual .center-photo{
+  z-index:10;
+
+  opacity:1;
+  filter:none;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1)
+    translateZ(0);
+
+  box-shadow:
+    0 8px 30px rgba(99,13,32,.10);
+}
+
+/* FOTO ANTERIOR */
+.carousel-visual .side-left{
+  z-index:5;
+
+  opacity:.70;
+  filter:blur(2px);
+
+  transform:
+    translate(-85%,-50%)
+    scale(.85)
+    translateZ(-100px);
+
+  border-radius:8px;
+}
+
+/* FOTO SIGUIENTE */
+.carousel-visual .side-right{
+  z-index:5;
+
+  opacity:.70;
+  filter:blur(2px);
+
+  transform:
+    translate(-15%,-50%)
+    scale(.85)
+    translateZ(-100px);
+
+  border-radius:8px;
+}
+
+/* En la referencia de Stitch, al pasar el mouse se aclaran */
+.carousel-visual .side-photo:hover{
+  opacity:.90;
+  filter:blur(0);
+}
+
+/* Imagen central y laterales llenan la tarjeta */
+.carousel-visual .center-photo>img,
+.carousel-visual .side-photo>img{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+/*
+ * Conservamos contain en la imagen principal para no cortar
+ * fotografías verticales. El fondo difuminado de nuestro proyecto
+ * sigue llenando la tarjeta.
+ */
+.carousel-visual .center-photo>img{
+  object-fit:contain;
+}
+
+.carousel-visual .side-photo>img{
+  object-fit:cover;
+}
+
+/* Ya no usamos el pequeño "enter" anterior */
+.carousel-visual .center-photo.enter{
+  animation:none!important;
+}
+
+/* ==========================================================
+   TRANSICION HACIA LA SIGUIENTE FOTO
+   ========================================================== */
+
+/* La actual se convierte visualmente en la anterior */
+.carousel-visual.stitch-moving-next .center-photo{
+  opacity:.70;
+  filter:blur(2px);
+
+  transform:
+    translate(-85%,-50%)
+    scale(.85)
+    translateZ(-100px);
+
+  z-index:5;
+}
+
+/* La siguiente entra al centro */
+.carousel-visual.stitch-moving-next .side-right{
+  opacity:1;
+  filter:blur(0);
+
+  transform:
+    translate(-50%,-50%)
+    scale(1)
+    translateZ(0);
+
+  z-index:11;
+
+  box-shadow:
+    0 8px 30px rgba(99,13,32,.10);
+}
+
+/* La anterior se retira suavemente */
+.carousel-visual.stitch-moving-next .side-left{
+  opacity:0;
+
+  transform:
+    translate(-118%,-50%)
+    scale(.72)
+    translateZ(-180px);
+}
+
+/* ==========================================================
+   TRANSICION HACIA LA FOTO ANTERIOR
+   ========================================================== */
+
+/* La actual se convierte visualmente en la siguiente */
+.carousel-visual.stitch-moving-prev .center-photo{
+  opacity:.70;
+  filter:blur(2px);
+
+  transform:
+    translate(-15%,-50%)
+    scale(.85)
+    translateZ(-100px);
+
+  z-index:5;
+}
+
+/* La anterior entra al centro */
+.carousel-visual.stitch-moving-prev .side-left{
+  opacity:1;
+  filter:blur(0);
+
+  transform:
+    translate(-50%,-50%)
+    scale(1)
+    translateZ(0);
+
+  z-index:11;
+
+  box-shadow:
+    0 8px 30px rgba(99,13,32,.10);
+}
+
+/* La siguiente se retira suavemente */
+.carousel-visual.stitch-moving-prev .side-right{
+  opacity:0;
+
+  transform:
+    translate(18%,-50%)
+    scale(.72)
+    translateZ(-180px);
+}
+
+/* Durante el movimiento quitamos información de la tarjeta que sale */
+.carousel-visual.stitch-moving-next .center-photo .photo-info,
+.carousel-visual.stitch-moving-prev .center-photo .photo-info,
+.carousel-visual.stitch-moving-next .center-photo .photo-gradient,
+.carousel-visual.stitch-moving-prev .center-photo .photo-gradient{
+  opacity:0;
+  transition:opacity .22s ease;
+}
+
+/* Reinicio interno sin salto visible después de cambiar las fuentes */
+.carousel-visual.stitch-no-transition .center-photo,
+.carousel-visual.stitch-no-transition .side-photo{
+  transition:none!important;
+}
+
+/* Las flechas permanecen por encima de las tarjetas 3D */
+.nav-arrow{
+  z-index:30;
+}
+
+/* QR permanece por encima de todo */
+.qr-corner-card{
+  z-index:35;
+}
+
+@media(max-width:1100px){
+  .carousel-visual{
+    height:min(64vh,570px);
+    min-height:470px;
+  }
+
+  .carousel-visual .center-photo,
+  .carousel-visual .side-photo{
+    width:min(720px,70vw);
+    height:min(470px,52vh);
+  }
+}
+
+@media(max-width:850px){
+  .carousel-visual{
+    min-height:520px;
+    height:58vh;
+  }
+
+  .carousel-visual .center-photo,
+  .carousel-visual .side-photo{
+    width:82vw;
+    height:52vh;
+  }
+
+  .carousel-visual .side-left{
+    transform:
+      translate(-92%,-50%)
+      scale(.78)
+      translateZ(-100px);
+  }
+
+  .carousel-visual .side-right{
+    transform:
+      translate(-8%,-50%)
+      scale(.78)
+      translateZ(-100px);
+  }
+}
+
+
+/* ==========================================================
+   TPBV VERCEL UNIFICADO v5.0
+   ========================================================== */
+.landing-page{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  margin:0;
+  padding:24px;
+  background:#f7f7f4;
+  color:#22251f;
+}
+.landing-shell{
+  width:min(620px,100%);
+  text-align:center;
+}
+.landing-logo{
+  display:block;
+  width:min(310px,78vw);
+  max-height:90px;
+  object-fit:contain;
+  margin:0 auto 28px;
+}
+.landing-shell h1{
+  margin:6px 0 10px;
+  font-family:"Quetzalli Sans","Karol Sans","Segoe UI",sans-serif;
+  font-size:clamp(38px,8vw,60px);
+  line-height:.98;
+  letter-spacing:-.045em;
+  color:#773357;
+}
+.landing-shell p{
+  max-width:520px;
+  margin:0 auto;
+  color:#73776f;
+  line-height:1.6;
+}
+.landing-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:50px;
+  margin-top:24px;
+  padding:0 24px;
+  border-radius:12px;
+  background:#773357;
+  color:#fff;
+  text-decoration:none;
+  font-weight:700;
+}

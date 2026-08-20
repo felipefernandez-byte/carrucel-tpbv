@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Carrusel de imágenes de TPBV</title>
+  <link rel="stylesheet" href="/css/estilos.css?v=5.0">
+</head>
+<body class="carousel-page">
+  <main class="event-shell">
+    <header class="event-header">
+      <div class="brand brand-morelos">
+        <img src="/assets/logo_morelos.png"
+             alt="Gobierno del Estado de Morelos">
+      </div>
+
+      <div class="event-title">
+        <span>Territorios de Paz y Buen Vivir</span>
+        <h1>Carrusel de imágenes de TPBV</h1>
+      </div>
+
+      <div class="brand brand-tpbv">
+        <img src="/assets/logo_tpbv.png"
+             alt="Territorios de Paz y Buen Vivir">
+      </div>
+    </header>
+
+    <section class="carousel-stage" id="carouselStage">
+      <button class="nav-arrow nav-prev"
+              id="prevBtn"
+              type="button"
+              aria-label="Imagen anterior">
+        <span>‹</span>
+      </button>
+
+      <div class="carousel-visual">
+        <button class="side-photo side-left"
+                id="leftPhotoBtn"
+                type="button"
+                aria-label="Imagen anterior">
+          <img id="leftPhoto" alt="Imagen anterior">
+        </button>
+
+        <div class="center-photo"
+             id="centerPhoto"
+             role="button"
+             tabindex="0"
+             aria-label="Pausar o continuar carrusel">
+          <img id="mainPhoto" alt="Imagen principal">
+
+          <div class="photo-gradient"></div>
+
+          <div class="photo-info">
+            <h2 id="municipio">Cargando…</h2>
+            <p id="usuarioOrigen"></p>
+          </div>
+
+          <div class="pause-feedback" id="pauseFeedback">
+            <span id="pauseIcon">❚❚</span>
+            <strong id="pauseText">Pausado</strong>
+          </div>
+
+          <div class="image-error hidden" id="imageError">
+            <strong>No fue posible mostrar esta imagen.</strong>
+            <span>Se intentará con la siguiente.</span>
+          </div>
+        </div>
+
+        <button class="side-photo side-right"
+                id="rightPhotoBtn"
+                type="button"
+                aria-label="Imagen siguiente">
+          <img id="rightPhoto" alt="Imagen siguiente">
+        </button>
+      </div>
+
+      <button class="nav-arrow nav-next"
+              id="nextBtn"
+              type="button"
+              aria-label="Imagen siguiente">
+        <span>›</span>
+      </button>
+
+      <aside class="qr-corner-card">
+        <div class="qr-copy">
+          <strong>Escanea el QR</strong>
+          <span>
+            Guarda esta foto o explora más imágenes de TPBV.
+          </span>
+        </div>
+
+        <div class="qr-box">
+          <img id="qrImage" alt="Código QR de la imagen">
+        </div>
+
+        <span class="qr-id" id="photoId"></span>
+      </aside>
+    </section>
+
+    <div class="progress-bottom" aria-hidden="true">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </main>
+
+  <script src="/js/carrusel.js?v=5.0"></script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f4f2">
+  <title>TPBV · Tu fotografía</title>
+  <link rel="stylesheet" href="/css/estilos.css?v=5.0">
+</head>
+<body class="detail-page">
+  <main class="detail-shell">
+
+    <header class="mobile-brand-header">
+      <img src="/assets/logo_tpbv.png"
+           alt="Territorios de Paz y Buen Vivir"
+           class="mobile-tpbv-logo">
+    </header>
+
+    <section class="mobile-intro">
+      <span class="mobile-eyebrow">CARRUSEL DE IMÁGENES</span>
+      <h1>Tu fotografía</h1>
+      <p>
+        Guárdala o explora más imágenes relacionadas.
+      </p>
+    </section>
+
+    <section class="selected-photo-card">
+      <div class="selected-photo-frame">
+        <div class="image-skeleton"
+             id="selectedSkeleton"></div>
+
+        <img id="selectedPhoto"
+             alt="Fotografía escaneada">
+      </div>
+
+      <div class="selected-photo-content">
+        <div class="selected-place-row">
+          <div>
+            <span class="selected-context"
+                  id="selectedContext">TPBV</span>
+            <h2 id="detailPlace">Cargando…</h2>
+          </div>
+
+          <span class="selected-role"
+                id="detailRole"></span>
+        </div>
+
+        <p class="selected-description"
+           id="detailIntro">
+          Consultando la información de esta fotografía…
+        </p>
+
+        <a id="downloadCurrentBtn"
+           class="download-main-btn"
+           href="#">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+          </svg>
+          Descargar esta foto
+        </a>
+      </div>
+    </section>
+
+    <section class="related-section hidden"
+             id="relatedSection">
+      <div class="section-title-row">
+        <div>
+          <span class="mobile-eyebrow">
+            RELACIÓN DEL REPORTE
+          </span>
+          <h2 id="relatedTitle">
+            Localidades relacionadas
+          </h2>
+        </div>
+
+        <span class="related-count"
+              id="relatedCount"></span>
+      </div>
+
+      <p class="section-help"
+         id="relatedHelp"></p>
+
+      <div class="locality-grid"
+           id="localityChoices"></div>
+
+      <button class="municipality-explore-btn hidden"
+              id="municipalityBtn"
+              type="button">
+        <span class="municipality-icon">⌂</span>
+        <span>
+          <small>VER TODO EL MUNICIPIO</small>
+          <strong id="municipalityBtnText">
+            Municipio
+          </strong>
+        </span>
+        <span class="municipality-arrow">›</span>
+      </button>
+    </section>
+
+    <section class="gallery-section hidden"
+             id="gallerySection">
+      <div class="section-title-row">
+        <div>
+          <span class="mobile-eyebrow">EXPLORAR</span>
+          <h2 id="galleryTitle">Más fotografías</h2>
+        </div>
+
+        <span class="gallery-total"
+              id="galleryCount"></span>
+      </div>
+
+      <div class="explore-controls">
+        <label class="gallery-search">
+          <span>⌕</span>
+          <input id="gallerySearch"
+                 type="search"
+                 placeholder="Buscar en las fotos mostradas"
+                 autocomplete="off">
+        </label>
+
+        <div class="selection-controls">
+          <button id="selectAllBtn"
+                  class="text-action-btn"
+                  type="button">
+            Seleccionar
+          </button>
+
+          <span class="selection-divider"></span>
+
+          <button id="clearSelectionBtn"
+                  class="text-action-btn"
+                  type="button">
+            Limpiar
+          </button>
+        </div>
+      </div>
+
+      <div class="gallery" id="gallery"></div>
+
+      <div class="gallery-empty hidden"
+           id="galleryEmpty">
+        No encontramos fotografías con esa búsqueda.
+      </div>
+    </section>
+
+    <div class="selection-dock hidden"
+         id="selectionDock">
+      <div>
+        <strong id="selectedCount">
+          0 seleccionadas
+        </strong>
+        <span>
+          Descarga hasta 10 copias optimizadas en ZIP.
+        </span>
+      </div>
+
+      <button id="downloadSelectedBtn"
+              type="button">
+        Descargar
+      </button>
+    </div>
+
+    <div class="download-status hidden"
+         id="downloadStatus"></div>
+
+    <footer class="mobile-footer">
+      <img src="/assets/logo_tpbv.png"
+           alt=""
+           aria-hidden="true">
+    </footer>
+
+  </main>
+
+  <script src="/js/detalle.js?v=5.0"></script>
+</body>
+</html>
