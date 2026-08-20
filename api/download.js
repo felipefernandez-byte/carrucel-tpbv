@@ -1,91 +1,505 @@
-const { Readable } = require("node:stream");
-const path = require("node:path");
-
-const { getPhoto } = require("./_lib/catalog");
 const {
+  Readable
+} =
+  require(
+    "node:stream"
+  );
+
+
+const path =
+  require(
+    "node:path"
+  );
+
+
+const {
+  getPhoto
+} =
+  require(
+    "./_lib/catalog"
+  );
+
+
+const {
+
   fetchDriveMetadata,
-  fetchDriveOriginal
-} = require("./_lib/google");
 
-const SAFE_ORIGINAL_BYTES = 4_000_000;
+  fetchDriveOriginal,
 
-function safeName(value, fallback) {
-  const base = path.basename(String(value || fallback));
+  fetchCredentialedUrl
+
+} =
+  require(
+    "./_lib/google"
+  );
+
+
+/* ==========================================================
+   TAMAÑO DE DESCARGA
+   ========================================================== */
+
+/*
+ * 1600 px es una buena resolución para:
+ *
+ * - celulares
+ * - WhatsApp
+ * - redes sociales
+ * - uso digital
+ *
+ * reduciendo mucho el peso.
+ */
+
+const DOWNLOAD_SIZE =
+  1600;
+
+
+/* ==========================================================
+   NOMBRE SEGURO
+   ========================================================== */
+
+function safeName(
+  value,
+  fallback
+) {
+
+  const base =
+    path.basename(
+
+      String(
+        value ||
+        fallback
+      )
+    );
+
+
   return base
-    .replace(/[<>:"/\\|?*\x00-\x1F]+/g, "_")
-    .slice(0, 180);
+
+    .replace(
+
+      /[<>:"/\\|?*\x00-\x1F]+/g,
+
+      "_"
+    )
+
+    .slice(
+      0,
+      160
+    );
 }
 
-module.exports = async function handler(req, res) {
+
+/* ==========================================================
+   NOMBRE OPTIMIZADO
+   ========================================================== */
+
+function optimizedFilename(
+  photo,
+  contentType
+) {
+
+  const original =
+    safeName(
+
+      photo.nombre_archivo,
+
+      photo.foto_id
+    );
+
+
+  const base =
+    original.replace(
+
+      /\.[^.]+$/,
+
+      ""
+    );
+
+
+  let extension =
+    ".jpg";
+
+
+  if (
+    String(contentType)
+      .includes(
+        "png"
+      )
+  ) {
+
+    extension =
+      ".png";
+  }
+
+
+  else if (
+
+    String(contentType)
+      .includes(
+        "webp"
+      )
+
+  ) {
+
+    extension =
+      ".webp";
+  }
+
+
+  return (
+
+    `${base}_optimizada${extension}`
+  );
+}
+
+
+/* ==========================================================
+   AUMENTAR TAMAÑO DE MINIATURA DE DRIVE
+   ========================================================== */
+
+function optimizedThumbnailUrl(
+  thumbnailLink
+) {
+
+  const value =
+    String(
+      thumbnailLink ||
+      ""
+    );
+
+
+  if (!value) {
+
+    return "";
+  }
+
+
+  /*
+   * Los thumbnailLink de Drive suelen terminar en:
+   *
+   * =s220
+   *
+   * Pedimos una copia de hasta 1600 px.
+   */
+
+  if (
+    /=s\d+[^/]*$/i
+      .test(
+        value
+      )
+  ) {
+
+    return value.replace(
+
+      /=s\d+[^/]*$/i,
+
+      `=w${DOWNLOAD_SIZE}-h${DOWNLOAD_SIZE}`
+    );
+  }
+
+
+  return (
+
+    value +
+
+    `=w${DOWNLOAD_SIZE}-h${DOWNLOAD_SIZE}`
+  );
+}
+
+
+/* ==========================================================
+   ENVIAR IMAGEN COMO DESCARGA
+   ========================================================== */
+
+function sendImage(
+
+  response,
+
+  res,
+
+  photo
+
+) {
+
+  const contentType =
+
+    response.headers.get(
+      "content-type"
+    )
+
+    ||
+
+    "image/jpeg";
+
+
+  const filename =
+    optimizedFilename(
+
+      photo,
+
+      contentType
+    );
+
+
+  res.statusCode =
+    200;
+
+
+  res.setHeader(
+
+    "Content-Type",
+
+    contentType
+  );
+
+
+  res.setHeader(
+
+    "Content-Disposition",
+
+    `attachment; filename="${filename}"`
+  );
+
+
+  res.setHeader(
+
+    "Cache-Control",
+
+    "private, no-store"
+  );
+
+
+  const length =
+    response.headers.get(
+      "content-length"
+    );
+
+
+  if (length) {
+
+    res.setHeader(
+
+      "Content-Length",
+
+      length
+    );
+  }
+
+
+  return Readable
+    .fromWeb(
+      response.body
+    )
+    .pipe(
+      res
+    );
+}
+
+
+/* ==========================================================
+   API
+   ========================================================== */
+
+module.exports =
+async function handler(
+  req,
+  res
+) {
+
   try {
-    const fotoId = String(req.query.foto_id || "");
-    const photo = getPhoto(fotoId);
+
+    const fotoId =
+      String(
+        req.query.foto_id ||
+        ""
+      );
+
+
+    const photo =
+      getPhoto(
+        fotoId
+      );
+
 
     if (!photo) {
-      return res.status(404).json({
-        error: "Fotografía no encontrada"
-      });
+
+      return res
+
+        .status(
+          404
+        )
+
+        .json({
+
+          error:
+
+            "Fotografía no encontrada"
+        });
     }
 
-    const meta = await fetchDriveMetadata(photo.drive_file_id);
-    const size = Number(meta.size || 0);
 
-    // Original pequeño: se descarga directamente.
-    if (size > 0 && size <= SAFE_ORIGINAL_BYTES) {
-      const response = await fetchDriveOriginal(photo.drive_file_id);
+    /* ======================================================
+       METADATOS
+       ====================================================== */
 
-      if (!response.ok || !response.body) {
-        throw new Error("Google Drive no pudo entregar la fotografía.");
+    const meta =
+      await fetchDriveMetadata(
+
+        photo.drive_file_id
+      );
+
+
+    /* ======================================================
+       VERSIÓN OPTIMIZADA
+       ====================================================== */
+
+    if (
+      meta.thumbnailLink
+    ) {
+
+      /*
+       * Primero intentamos una versión
+       * de aproximadamente 1600 px.
+       */
+
+      const optimizedUrl =
+        optimizedThumbnailUrl(
+
+          meta.thumbnailLink
+        );
+
+
+      const optimized =
+        await fetchCredentialedUrl(
+
+          optimizedUrl,
+
+          meta._accessToken
+        );
+
+
+      if (
+
+        optimized.ok
+
+        &&
+
+        optimized.body
+
+      ) {
+
+        return sendImage(
+
+          optimized,
+
+          res,
+
+          photo
+        );
       }
 
-      const filename = safeName(
-        photo.nombre_archivo,
-        `${photo.foto_id}.jpg`
-      );
 
-      res.statusCode = 200;
-      res.setHeader(
-        "Content-Type",
-        response.headers.get("content-type") ||
-          meta.mimeType ||
-          "application/octet-stream"
-      );
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${filename}"`
-      );
-      res.setHeader("Cache-Control", "private, no-store");
+      /*
+       * Si Drive no acepta el tamaño personalizado,
+       * usamos su thumbnail normal.
+       */
 
-      return Readable.fromWeb(response.body).pipe(res);
+      const thumbnail =
+        await fetchCredentialedUrl(
+
+          meta.thumbnailLink,
+
+          meta._accessToken
+        );
+
+
+      if (
+
+        thumbnail.ok
+
+        &&
+
+        thumbnail.body
+
+      ) {
+
+        return sendImage(
+
+          thumbnail,
+
+          res,
+
+          photo
+        );
+      }
     }
 
-    // Para originales grandes Vercel no debe actuar como proxy
-    // por su límite de payload. Drive entrega el archivo desde su URL.
-    if (meta.webContentLink) {
-      res.statusCode = 302;
-      res.setHeader("Location", meta.webContentLink);
-      res.setHeader("Cache-Control", "private, no-store");
-      return res.end();
+
+    /* ======================================================
+       FALLBACK
+       ====================================================== */
+
+    /*
+     * En caso de que Drive no tenga miniatura,
+     * utilizamos el original.
+     */
+
+    const original =
+      await fetchDriveOriginal(
+
+        photo.drive_file_id
+      );
+
+
+    if (
+
+      !original.ok
+
+      ||
+
+      !original.body
+
+    ) {
+
+      throw new Error(
+
+        "Google Drive no pudo entregar la fotografía."
+      );
     }
 
-    if (meta.webViewLink) {
-      res.statusCode = 302;
-      res.setHeader("Location", meta.webViewLink);
-      res.setHeader("Cache-Control", "private, no-store");
-      return res.end();
-    }
 
-    return res.status(502).json({
-      error: "No existe una URL de descarga para esta fotografía"
-    });
+    return sendImage(
+
+      original,
+
+      res,
+
+      photo
+    );
+
 
   } catch (error) {
-    console.error(error);
 
-    if (!res.headersSent) {
-      return res.status(500).json({
-        error: "No fue posible descargar la fotografía"
-      });
+    console.error(
+      error
+    );
+
+
+    if (
+      !res.headersSent
+    ) {
+
+      return res
+
+        .status(
+          500
+        )
+
+        .json({
+
+          error:
+
+            "No fue posible descargar la fotografía"
+        });
     }
   }
 };

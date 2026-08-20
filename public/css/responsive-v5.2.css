@@ -1,0 +1,1060 @@
+/* ==========================================================
+   TPBV RESPONSIVE v5.2
+   CELULAR 320px → PROYECTOR / 4K
+   ========================================================== */
+
+
+/* ==========================================================
+   BASE
+   ========================================================== */
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+img {
+    max-width: 100%;
+}
+
+.carousel-page,
+.detail-page {
+    width: 100%;
+}
+
+
+/* ==========================================================
+   CARRUSEL
+   DESKTOP NORMAL
+   1200 - 1599
+   ========================================================== */
+
+@media (min-width: 1200px) {
+
+    .carousel-visual {
+        width: min(
+            1380px,
+            90vw
+        );
+
+        height: min(
+            70vh,
+            680px
+        );
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: min(
+            880px,
+            60vw
+        );
+
+        height: min(
+            560px,
+            58vh
+        );
+    }
+}
+
+
+/* ==========================================================
+   PANTALLA GRANDE
+   1600 - 2199
+   ========================================================== */
+
+@media (min-width: 1600px) {
+
+    .event-header {
+        min-height: 112px;
+
+        padding-left: 46px;
+        padding-right: 46px;
+    }
+
+
+    .brand img {
+        height: 84px;
+    }
+
+
+    .brand-tpbv img {
+        max-height: 72px;
+    }
+
+
+    .event-title h1 {
+        font-size: clamp(
+            48px,
+            3vw,
+            64px
+        );
+    }
+
+
+    .event-title span {
+        font-size: 12px;
+    }
+
+
+    .carousel-stage {
+        padding-left: 90px;
+        padding-right: 90px;
+    }
+
+
+    .carousel-visual {
+
+        width: min(
+            1650px,
+            92vw
+        );
+
+        height: min(
+            72vh,
+            790px
+        );
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: min(
+            1050px,
+            60vw
+        );
+
+        height: min(
+            650px,
+            60vh
+        );
+    }
+
+
+    .photo-info {
+        left: 36px;
+        right: 36px;
+        bottom: 31px;
+    }
+
+
+    .photo-info h2 {
+
+        font-size: clamp(
+            48px,
+            3.4vw,
+            68px
+        );
+    }
+
+
+    .photo-info p {
+
+        font-size: 19px;
+    }
+
+
+    .nav-arrow {
+
+        width: 60px;
+        height: 60px;
+    }
+
+
+    .nav-arrow span {
+
+        font-size: 50px;
+    }
+
+
+    .qr-corner-card {
+
+        width: 275px;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            122px;
+
+        padding: 13px;
+    }
+
+
+    .qr-box {
+
+        width: 122px;
+        height: 122px;
+    }
+
+
+    .qr-copy strong {
+
+        font-size: 14px;
+    }
+
+
+    .qr-copy span {
+
+        font-size: 10px;
+    }
+}
+
+
+/* ==========================================================
+   PROYECTORES GRANDES / QHD
+   2200 - 2999
+   ========================================================== */
+
+@media (min-width: 2200px) {
+
+    .event-header {
+
+        min-height: 135px;
+
+        padding-left: 60px;
+        padding-right: 60px;
+    }
+
+
+    .brand img {
+
+        height: 100px;
+    }
+
+
+    .brand-tpbv img {
+
+        max-height: 88px;
+    }
+
+
+    .event-title h1 {
+
+        font-size: clamp(
+            60px,
+            3vw,
+            82px
+        );
+    }
+
+
+    .event-title span {
+
+        font-size: 15px;
+    }
+
+
+    .carousel-visual {
+
+        width: min(
+            2050px,
+            92vw
+        );
+
+        height: min(
+            74vh,
+            980px
+        );
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: min(
+            1280px,
+            58vw
+        );
+
+        height: min(
+            790px,
+            61vh
+        );
+    }
+
+
+    .photo-info {
+
+        left: 46px;
+        right: 46px;
+        bottom: 38px;
+    }
+
+
+    .photo-info h2 {
+
+        font-size: clamp(
+            66px,
+            3.2vw,
+            90px
+        );
+    }
+
+
+    .photo-info p {
+
+        font-size: 23px;
+    }
+
+
+    .nav-arrow {
+
+        width: 70px;
+        height: 70px;
+    }
+
+
+    .nav-arrow span {
+
+        font-size: 58px;
+    }
+
+
+    .qr-corner-card {
+
+        width: 330px;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            148px;
+
+        padding: 16px;
+
+        border-radius: 22px;
+    }
+
+
+    .qr-box {
+
+        width: 148px;
+        height: 148px;
+    }
+
+
+    .qr-copy strong {
+
+        font-size: 17px;
+    }
+
+
+    .qr-copy span {
+
+        font-size: 12px;
+    }
+
+
+    .qr-id {
+
+        font-size: 9px;
+    }
+}
+
+
+/* ==========================================================
+   4K / PANTALLAS GIGANTES
+   3000+
+   ========================================================== */
+
+@media (min-width: 3000px) {
+
+    .event-header {
+
+        min-height: 165px;
+    }
+
+
+    .brand img {
+
+        height: 125px;
+    }
+
+
+    .brand-tpbv img {
+
+        max-height: 108px;
+    }
+
+
+    .event-title h1 {
+
+        font-size: clamp(
+            76px,
+            2.8vw,
+            108px
+        );
+    }
+
+
+    .event-title span {
+
+        font-size: 18px;
+    }
+
+
+    .carousel-visual {
+
+        width: min(
+            2700px,
+            92vw
+        );
+
+        height: min(
+            75vh,
+            1250px
+        );
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: min(
+            1650px,
+            56vw
+        );
+
+        height: min(
+            1020px,
+            62vh
+        );
+    }
+
+
+    .photo-info h2 {
+
+        font-size: clamp(
+            86px,
+            3vw,
+            122px
+        );
+    }
+
+
+    .photo-info p {
+
+        font-size: 30px;
+    }
+
+
+    .qr-corner-card {
+
+        width: 410px;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            185px;
+    }
+
+
+    .qr-box {
+
+        width: 185px;
+        height: 185px;
+    }
+
+
+    .qr-copy strong {
+
+        font-size: 21px;
+    }
+
+
+    .qr-copy span {
+
+        font-size: 15px;
+    }
+
+
+    .nav-arrow {
+
+        width: 82px;
+        height: 82px;
+    }
+}
+
+
+/* ==========================================================
+   LAPTOP / TABLET HORIZONTAL
+   ========================================================== */
+
+@media (
+    min-width: 851px
+)
+and
+(
+    max-width: 1199px
+) {
+
+    .carousel-visual {
+
+        width: 94vw;
+    }
+
+
+    .qr-corner-card {
+
+        width: 220px;
+    }
+}
+
+
+/* ==========================================================
+   PANTALLAS CON POCA ALTURA
+   ========================================================== */
+
+@media (
+    min-width: 851px
+)
+and
+(
+    max-height: 720px
+) {
+
+    .event-header {
+
+        min-height: 78px;
+
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+
+
+    .brand img {
+
+        height: 58px;
+    }
+
+
+    .brand-tpbv img {
+
+        max-height: 50px;
+    }
+
+
+    .event-title h1 {
+
+        font-size: clamp(
+            28px,
+            2.5vw,
+            42px
+        );
+    }
+
+
+    .carousel-visual {
+
+        height: 62vh;
+
+        min-height: 390px;
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        height: 50vh;
+    }
+}
+
+
+/* ==========================================================
+   TABLETS Y CELULARES
+   <= 850
+   ========================================================== */
+
+@media (max-width: 850px) {
+
+    .carousel-page {
+
+        overflow-x: hidden;
+    }
+
+
+    .event-shell {
+
+        min-height: 100svh;
+    }
+
+
+    .carousel-stage {
+
+        width: 100%;
+
+        min-height: 620px;
+
+        padding:
+
+            10px
+            46px
+            150px;
+    }
+
+
+    .carousel-visual {
+
+        width: 100%;
+
+        height: min(
+            60svh,
+            560px
+        );
+
+        min-height: 430px;
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: 82vw;
+
+        height: min(
+            52svh,
+            480px
+        );
+    }
+
+
+    .photo-info {
+
+        left: 20px;
+        right: 20px;
+        bottom: 19px;
+    }
+
+
+    .photo-info h2 {
+
+        font-size: clamp(
+            28px,
+            7vw,
+            44px
+        );
+    }
+
+
+    .photo-info p {
+
+        font-size: 14px;
+    }
+}
+
+
+/* ==========================================================
+   CELULARES
+   <= 600
+   ========================================================== */
+
+@media (max-width: 600px) {
+
+    /* ============================
+       CARRUSEL
+       ============================ */
+
+    .event-header {
+
+        min-height: auto;
+
+        padding:
+            10px
+            12px;
+
+        gap: 7px;
+    }
+
+
+    .brand img {
+
+        width: min(
+            210px,
+            65vw
+        );
+
+        height: 45px;
+    }
+
+
+    .brand-tpbv img {
+
+        max-height: 40px;
+    }
+
+
+    .event-title span {
+
+        font-size: 8px;
+
+        margin-bottom: 3px;
+    }
+
+
+    .event-title h1 {
+
+        font-size: clamp(
+            23px,
+            7.5vw,
+            31px
+        );
+    }
+
+
+    .carousel-stage {
+
+        min-height: 580px;
+
+        padding:
+
+            8px
+            35px
+            145px;
+    }
+
+
+    .carousel-visual {
+
+        min-height: 380px;
+
+        height: min(
+            56svh,
+            500px
+        );
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: 88vw;
+
+        height: min(
+            50svh,
+            440px
+        );
+    }
+
+
+    .carousel-visual .side-left {
+
+        transform:
+
+            translate(
+                -96%,
+                -50%
+            )
+
+            scale(.74)
+
+            translateZ(-100px);
+    }
+
+
+    .carousel-visual .side-right {
+
+        transform:
+
+            translate(
+                -4%,
+                -50%
+            )
+
+            scale(.74)
+
+            translateZ(-100px);
+    }
+
+
+    .nav-arrow {
+
+        width: 42px;
+        height: 42px;
+    }
+
+
+    .nav-prev {
+
+        left: 5px;
+    }
+
+
+    .nav-next {
+
+        right: 5px;
+    }
+
+
+    .photo-info h2 {
+
+        font-size: clamp(
+            25px,
+            8vw,
+            36px
+        );
+    }
+
+
+    .photo-info p {
+
+        font-size: 12px;
+    }
+
+
+    .qr-corner-card {
+
+        width: min(
+            235px,
+            82vw
+        );
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            92px;
+
+        padding: 10px;
+    }
+
+
+    .qr-box {
+
+        width: 92px;
+        height: 92px;
+    }
+
+
+    /* ============================
+       DETALLE QR
+       ============================ */
+
+    .mobile-v32 .detail-shell {
+
+        width: 100%;
+
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+
+    .selected-place-row {
+
+        flex-wrap: wrap;
+    }
+
+
+    .selected-photo-content h2 {
+
+        font-size: clamp(
+            26px,
+            8vw,
+            34px
+        );
+    }
+
+
+    .gallery-main-actions {
+
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+/* ==========================================================
+   CELULARES PEQUEÑOS
+   <= 390
+   ========================================================== */
+
+@media (max-width: 390px) {
+
+    .event-shell {
+
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+
+    .event-header {
+
+        width: calc(
+            100% + 12px
+        );
+
+        margin-left: -6px;
+        margin-right: -6px;
+    }
+
+
+    .event-title h1 {
+
+        font-size: clamp(
+            21px,
+            7vw,
+            27px
+        );
+    }
+
+
+    .carousel-stage {
+
+        min-height: 545px;
+
+        padding:
+
+            6px
+            29px
+            140px;
+    }
+
+
+    .carousel-visual {
+
+        min-height: 350px;
+    }
+
+
+    .carousel-visual .center-photo,
+    .carousel-visual .side-photo {
+
+        width: 92vw;
+
+        height: min(
+            48svh,
+            400px
+        );
+    }
+
+
+    .qr-corner-card {
+
+        width: min(
+            220px,
+            86vw
+        );
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            84px;
+    }
+
+
+    .qr-box {
+
+        width: 84px;
+        height: 84px;
+    }
+
+
+    /* ============================
+       DETALLE
+       ============================ */
+
+    .mobile-v32 .detail-shell {
+
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+
+    .mobile-brand-header {
+
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+
+    .mobile-intro {
+
+        padding-top: 23px;
+    }
+
+
+    .mobile-intro h1 {
+
+        font-size: clamp(
+            32px,
+            12vw,
+            42px
+        );
+    }
+
+
+    .selected-photo-content {
+
+        padding: 16px;
+    }
+
+
+    .related-section {
+
+        padding: 17px;
+    }
+
+
+    .mobile-v32 .gallery {
+
+        gap: 7px;
+    }
+
+
+    .gallery-card-body {
+
+        padding:
+            7px
+            7px;
+    }
+
+
+    .gallery-card-body strong {
+
+        font-size: 10px;
+    }
+
+
+    .gallery-download {
+
+        width: 38px !important;
+
+        min-width: 38px !important;
+
+        height: 38px !important;
+
+        flex-basis: 38px;
+    }
+}
+
+
+/* ==========================================================
+   MÍNIMO PRÁCTICO: 320px
+   ========================================================== */
+
+@media (max-width: 340px) {
+
+    .mobile-v32 .detail-shell {
+
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+
+    .gallery-main-actions button {
+
+        font-size: 12px;
+    }
+
+
+    .selection-controls {
+
+        gap: 7px;
+    }
+
+
+    .text-action-btn {
+
+        font-size: 10px;
+    }
+
+
+    .selected-role {
+
+        font-size: 8px;
+    }
+}
