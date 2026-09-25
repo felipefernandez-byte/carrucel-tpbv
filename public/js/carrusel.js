@@ -43,6 +43,9 @@ const els = {
   usuarioOrigen:
     $("usuarioOrigen"),
 
+  eventoNombre:
+    $("eventoNombre"),
+
   qrImage:
     $("qrImage"),
 
@@ -575,6 +578,35 @@ function renderWindow(
     nombreResponsable(
       current
     );
+
+
+  /*
+   * Evento (solo lo traen los lotes nuevos).
+   */
+  if (
+    els.eventoNombre
+  ) {
+
+    const evento =
+      String(
+        current.evento
+        ||
+        ""
+      )
+        .trim();
+
+
+    els.eventoNombre.textContent =
+      evento;
+
+
+    els.eventoNombre
+      .classList
+      .toggle(
+        "hidden",
+        !evento
+      );
+  }
 
 
   if (

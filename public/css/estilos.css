@@ -177,6 +177,17 @@ button,a{font:inherit}
   letter-spacing:-.045em;
   line-height:1;
 }
+.photo-event{
+  display:inline-block;
+  margin:0 0 10px;
+  padding:5px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.02em;
+  backdrop-filter:blur(4px);
+}
 .photo-info p{
   margin:8px 0 0;
   font-size:16px;

@@ -4,3 +4,9 @@
 .vercel/
 node_modules/
 .DS_Store
+
+.vercel
+
+# Respaldos locales que genera 06_APLICAR_REVISION_MENORES.
+# OJO: data/revision_menores.csv SI se sube; Vercel lo usa al compilar.
+data/catalogo_carrusel_antes_menores_*.csv

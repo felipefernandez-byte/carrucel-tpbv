@@ -1,10 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const { hasFaceBoxes } = require("../api/_lib/blur.js");
 
 const ROOT = process.cwd();
 const INPUT = path.join(ROOT, "data", "catalogo_carrusel.csv");
 const OUTPUT_DIR = path.join(ROOT, "generated");
 const OUTPUT = path.join(OUTPUT_DIR, "catalog.min.json");
+const REVIEW = path.join(ROOT, "data", "revision_menores.csv");
 
 function parseCsv(text) {
   const rows = [];
@@ -102,10 +107,73 @@ if (missing.length) {
   process.exit(1);
 }
 
+// La revisión de menores vive en su propio archivo (data/revision_menores.csv)
+// para que sobreviva cuando se carga un catálogo nuevo con 01_CARGAR_NUEVO_CATALOGO.
+// Si el archivo existe, la protección está activa: toda foto sin veredicto
+// definitivo (nueva, REVISAR o con error) queda bloqueada para descarga.
+const reviewById = new Map();
+const protectionActive = fs.existsSync(REVIEW);
+
+if (protectionActive) {
+  const reviewMatrix = parseCsv(
+    fs.readFileSync(REVIEW, "utf8").replace(/^﻿/, "")
+  );
+  const reviewHeaders = (reviewMatrix[0] || []).map(h => h.trim());
+  for (const values of reviewMatrix.slice(1)) {
+    const r = {};
+    reviewHeaders.forEach((h, i) => { r[h] = values[i] ?? ""; });
+    const id = String(r.foto_id || "").trim();
+    if (id) reviewById.set(id, r);
+  }
+}
+
+const reviewCounts = { SIN_MENORES: 0, CON_MENORES: 0, PENDIENTE: 0 };
+
+function reviewFields(row, fotoId) {
+  const r = reviewById.get(fotoId);
+
+  if (r) {
+    const clasificacion = String(r.clasificacion || "").trim().toUpperCase();
+    const definitiva = clasificacion === "SIN_MENORES" || clasificacion === "CON_MENORES";
+    reviewCounts[definitiva ? clasificacion : "PENDIENTE"]++;
+    return {
+      revision_menores: definitiva ? clasificacion : "REVISAR",
+      permitir_descarga: clasificacion === "SIN_MENORES" ? "SI" : "NO",
+      fuente_revision_menores: r.fuente_revision || "",
+      confianza_revision_menores: r.confianza || "",
+      observacion_revision_menores: r.observacion || "",
+      caras: clasificacion === "SIN_MENORES" ? "" : (r.caras || "")
+    };
+  }
+
+  if (protectionActive) {
+    reviewCounts.PENDIENTE++;
+    return {
+      revision_menores: "PENDIENTE",
+      permitir_descarga: "NO",
+      fuente_revision_menores: "",
+      confianza_revision_menores: "",
+      observacion_revision_menores: "Fotografía nueva sin clasificar",
+      caras: ""
+    };
+  }
+
+  // Sin archivo de revisión: se respetan las columnas del CSV (comportamiento legado).
+  return {
+    revision_menores: row.revision_menores || "",
+    permitir_descarga: row.permitir_descarga || "",
+    fuente_revision_menores: row.fuente_revision_menores || "",
+    confianza_revision_menores: row.confianza_revision_menores || "",
+    observacion_revision_menores: row.observacion_revision_menores || "",
+    caras: row.caras || ""
+  };
+}
+
 const photos = [];
 const byId = {};
 const localities = {};
 const municipalities = {};
+const events = {};
 const carousel = [];
 
 for (let i = 1; i < matrix.length; i++) {
@@ -141,7 +209,16 @@ for (let i = 1; i < matrix.length; i++) {
     registro_softr_id: row.registro_softr_id || "",
     campo_evidencia: row.campo_evidencia || "",
     duracion_carrusel_segundos: row.duracion_carrusel_segundos || "10",
-    mostrar_carrusel: row.mostrar_carrusel || ""
+    mostrar_carrusel: row.mostrar_carrusel || "",
+
+    // Evento (opcional). Los lotes nuevos llegan por municipio y evento;
+    // el catálogo actual no trae estas columnas y quedan vacías.
+    evento: String(row.evento || "").trim(),
+    evento_id: String(row.evento_id || "").trim(),
+    fecha_evento: String(row.fecha_evento || "").trim(),
+
+    // Protección de descarga por revisión previa de presencia de menores.
+    ...reviewFields(row, fotoId)
   };
 
   const index = photos.length;
@@ -153,7 +230,15 @@ for (let i = 1; i < matrix.length; i++) {
     continue;
   }
 
-  carousel.push(index);
+  // Una foto protegida sin rostros ubicados se sirve difuminada completa:
+  // sigue en galerías (con candado) pero no se proyecta en el carrusel.
+  const fullyBlurred =
+    String(compact.permitir_descarga).trim().toUpperCase() === "NO" &&
+    !hasFaceBoxes(compact.caras);
+
+  if (!fullyBlurred) {
+    carousel.push(index);
+  }
 
   const locs = new Set();
   if (compact.localidad) locs.add(compact.localidad);
@@ -174,6 +259,13 @@ for (let i = 1; i < matrix.length; i++) {
     if (!municipalities[key]) municipalities[key] = [];
     municipalities[key].push(index);
   }
+
+  // Se indexa por evento_id si existe; si no, por el nombre del evento.
+  const eventKey = norm(compact.evento_id || compact.evento);
+  if (eventKey) {
+    if (!events[eventKey]) events[eventKey] = [];
+    events[eventKey].push(index);
+  }
 }
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -185,6 +277,7 @@ fs.writeFileSync(
     byId,
     localities,
     municipalities,
+    events,
     carousel
   })
 );
@@ -197,5 +290,14 @@ console.log(`Filas con foto_id:       ${photos.length.toLocaleString("es-MX")}`)
 console.log(`Fotos para carrusel:     ${carousel.length.toLocaleString("es-MX")}`);
 console.log(`Localidades indexadas:   ${Object.keys(localities).length.toLocaleString("es-MX")}`);
 console.log(`Municipios indexados:    ${Object.keys(municipalities).length.toLocaleString("es-MX")}`);
+console.log(`Eventos indexados:       ${Object.keys(events).length.toLocaleString("es-MX")}`);
+if (protectionActive) {
+  console.log("Protección de menores:   ACTIVA (data/revision_menores.csv)");
+  console.log(`  Descargables:          ${reviewCounts.SIN_MENORES.toLocaleString("es-MX")}`);
+  console.log(`  Con menores:           ${reviewCounts.CON_MENORES.toLocaleString("es-MX")}`);
+  console.log(`  Pendientes (bloq.):    ${reviewCounts.PENDIENTE.toLocaleString("es-MX")}`);
+} else {
+  console.log("Protección de menores:   sin data/revision_menores.csv (todas descargables)");
+}
 console.log("Archivo generado: generated/catalog.min.json");
 console.log("");

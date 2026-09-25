@@ -220,6 +220,8 @@ function getPhotosBy({
 
   municipio,
 
+  evento,
+
   limit = 250,
 
   offset = 0
@@ -244,6 +246,23 @@ function getPhotosBy({
       data.localities[
         norm(
           localidad
+        )
+      ]
+      ||
+      [];
+  }
+
+
+  /* ==============================
+     EVENTO
+     ============================== */
+
+  else if (evento) {
+
+    indexes =
+      (data.events || {})[
+        norm(
+          evento
         )
       ]
       ||
@@ -379,6 +398,51 @@ function getPhotosBy({
 
 
 /* ==========================================================
+   VERSIÓN PÚBLICA DE UNA FOTO
+   ========================================================== */
+
+/*
+ * En fotos protegidas no se publica el enlace de Drive
+ * (permitiría ver el original sin difuminar), ni la
+ * observación del modelo, ni las coordenadas de rostros.
+ */
+function publicPhoto(
+  photo
+) {
+
+  if (
+    !photo ||
+    String(
+      photo.permitir_descarga ||
+      ""
+    )
+      .trim()
+      .toUpperCase() !==
+    "NO"
+  ) {
+
+    return photo;
+  }
+
+
+  const {
+    drive_file_id,
+    drive_view_url,
+    nombre_archivo,
+    observacion_revision_menores,
+    confianza_revision_menores,
+    fuente_revision_menores,
+    caras,
+    ...safe
+  } =
+    photo;
+
+
+  return safe;
+}
+
+
+/* ==========================================================
    EXPORTAR
    ========================================================== */
 
@@ -390,5 +454,7 @@ module.exports = {
 
   getCarouselWindow,
 
-  getPhotosBy
+  getPhotosBy,
+
+  publicPhoto
 };

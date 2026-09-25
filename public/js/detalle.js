@@ -177,6 +177,42 @@ function downloadUrl(photo) {
 
 
 /* ==========================================================
+   PROTECCIÓN DE DESCARGA
+   ========================================================== */
+
+const PROTECTED_DOWNLOAD_MESSAGE =
+    "Esta fotografía no está disponible para descarga directa. Si deseas obtenerla, solicítala con tu promotor.";
+
+
+function isDownloadAllowed(photo) {
+
+    const flag =
+        String(
+            photo?.permitir_descarga ||
+            ""
+        )
+            .trim()
+            .toUpperCase();
+
+
+    /*
+     * Compatibilidad con el catálogo anterior:
+     * si todavía no existe el campo, no alteramos el comportamiento.
+     * Una vez aplicada la revisión, las filas tendrán SI o NO.
+     */
+    return flag !== "NO";
+}
+
+
+function showProtectedDownloadMessage() {
+
+    setStatus(
+        PROTECTED_DOWNLOAD_MESSAGE
+    );
+}
+
+
+/* ==========================================================
    FETCH JSON
    ========================================================== */
 
@@ -279,6 +315,19 @@ function municipalityOf(photo) {
 
 
     return "";
+}
+
+
+/* ==========================================================
+   EVENTO (solo lotes nuevos)
+   ========================================================== */
+
+function eventOf(photo) {
+
+    return String(
+        photo?.evento || ""
+    )
+        .trim();
 }
 
 
@@ -717,6 +766,22 @@ function createGalleryCard(photo) {
         "gallery-card";
 
 
+    const downloadAllowed =
+        isDownloadAllowed(
+            photo
+        );
+
+
+    if (
+        !downloadAllowed
+    ) {
+
+        card.classList.add(
+            "download-protected"
+        );
+    }
+
+
     card.dataset.photoId =
         photo.foto_id;
 
@@ -732,7 +797,9 @@ function createGalleryCard(photo) {
 
     card.setAttribute(
         "aria-label",
-        `Seleccionar fotografía de ${cardPlace(photo)}`
+        downloadAllowed
+            ? `Seleccionar fotografía de ${cardPlace(photo)}`
+            : `Fotografía protegida. ${PROTECTED_DOWNLOAD_MESSAGE}`
     );
 
 
@@ -843,43 +910,63 @@ function createGalleryCard(photo) {
 
 
     download.href =
-        downloadUrl(photo);
+        downloadAllowed
+            ? downloadUrl(photo)
+            : "#";
 
 
     download.title =
-        "Descargar fotografía";
+        downloadAllowed
+            ? "Descargar fotografía"
+            : "Solicitar fotografía con tu promotor";
 
 
     download.setAttribute(
         "aria-label",
-        "Descargar fotografía"
+        downloadAllowed
+            ? "Descargar fotografía"
+            : "Fotografía protegida. Solicítala con tu promotor"
     );
 
 
-    /*
-     * IMPORTANTE:
-     *
-     * Ya no mostramos la palabra:
-     *
-     * Descargar
-     *
-     * Solo aparece el ícono.
-     */
-    download.innerHTML = `
-        <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true">
+    download.classList.toggle(
+        "is-protected",
+        !downloadAllowed
+    );
 
-            <path
-                d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"/>
 
-        </svg>
-    `;
+    download.innerHTML =
+        downloadAllowed
+            ? `
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.9"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                </svg>
+            `
+            : `
+                <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true">
+
+                    <path
+                        d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"/>
+
+                </svg>
+            `;
 
 
     /*
@@ -891,6 +978,16 @@ function createGalleryCard(photo) {
         event => {
 
             event.stopPropagation();
+
+
+            if (
+                !downloadAllowed
+            ) {
+
+                event.preventDefault();
+
+                showProtectedDownloadMessage();
+            }
         }
     );
 
@@ -925,6 +1022,16 @@ function createGalleryCard(photo) {
                     "a"
                 )
             ) {
+
+                return;
+            }
+
+
+            if (
+                !downloadAllowed
+            ) {
+
+                showProtectedDownloadMessage();
 
                 return;
             }
@@ -1148,6 +1255,7 @@ function applyGallerySearch() {
                             cardPlace(photo),
                             photo.municipio,
                             photo.localidad,
+                            photo.evento,
                             photo.foto_id
                         ]
                             .join(" ")
@@ -1290,6 +1398,7 @@ async function loadGallery(
 
         const scope =
             params.localidad ||
+            params.evento ||
             params.municipio ||
             "este territorio";
 
@@ -1319,7 +1428,15 @@ async function loadGallery(
 
                     :
 
-                    "Descargar todo el municipio";
+                    params.evento
+
+                        ?
+
+                        "Descargar todo el evento"
+
+                        :
+
+                        "Descargar todo el municipio";
         }
 
 
@@ -1679,6 +1796,59 @@ function renderRelated() {
                     }
                 );
             }
+        }
+    }
+
+
+    /* ======================================================
+       VER TODO EL EVENTO
+       ====================================================== */
+
+    const eventBtn =
+        $("eventBtn");
+
+
+    const evento =
+        eventOf(
+            current
+        );
+
+
+    if (
+        eventBtn
+    ) {
+
+        eventBtn.classList.toggle(
+            "hidden",
+            !evento
+        );
+
+
+        if (
+            evento
+        ) {
+
+            section.classList.remove(
+                "hidden"
+            );
+
+
+            $("eventBtnText").textContent =
+                evento;
+
+
+            eventBtn.onclick =
+                () => {
+
+                    loadGallery(
+                        {
+                            evento:
+                                current.evento_id ||
+                                evento
+                        },
+                        `Fotos de ${evento}`
+                    );
+                };
         }
     }
 
@@ -2813,6 +2983,10 @@ function selectedPhotos() {
                 selectedPhotoIds.has(
                     photo.foto_id
                 )
+                &&
+                isDownloadAllowed(
+                    photo
+                )
         );
 }
 
@@ -2903,6 +3077,8 @@ async function downloadAllCurrentScope() {
     const scope =
         activeGalleryParams?.localidad
         ||
+        activeGalleryParams?.evento
+        ||
         activeGalleryParams?.municipio
         ||
         "territorio";
@@ -2920,10 +3096,56 @@ async function downloadAllCurrentScope() {
             );
 
 
+    const downloadablePhotos =
+        visibleGalleryPhotos
+            .filter(
+                photo =>
+                    isDownloadAllowed(
+                        photo
+                    )
+            );
+
+
+    const protectedCount =
+        visibleGalleryPhotos.length -
+        downloadablePhotos.length;
+
+
+    if (
+        downloadablePhotos.length === 0
+    ) {
+
+        setStatus(
+            "Las fotografías de esta selección requieren solicitarse con el promotor."
+        );
+
+        return;
+    }
+
+
+    if (
+        protectedCount > 0
+    ) {
+
+        setStatus(
+            `${protectedCount} fotografía${
+                protectedCount === 1
+                    ? ""
+                    : "s"
+            } protegida${
+                protectedCount === 1
+                    ? " no se incluirá"
+                    : "s no se incluirán"
+            } en la descarga.`,
+            true
+        );
+    }
+
+
     try {
 
         await downloadPhotosAsZip(
-            visibleGalleryPhotos,
+            downloadablePhotos,
             `TPBV_${safeScope}_todas.zip`
         );
 
@@ -3104,8 +3326,15 @@ async function init() {
     ) {
 
         $("selectedContext").textContent =
-            municipality ||
-            "TPBV";
+            [
+                municipality ||
+                "TPBV",
+                eventOf(
+                    current
+                )
+            ]
+                .filter(Boolean)
+                .join(" · ");
     }
 
 
@@ -3117,10 +3346,70 @@ async function init() {
         $("downloadCurrentBtn")
     ) {
 
-        $("downloadCurrentBtn").href =
-            downloadUrl(
+        const downloadButton =
+            $("downloadCurrentBtn");
+
+
+        const allowed =
+            isDownloadAllowed(
                 current
             );
+
+
+        downloadButton.classList.toggle(
+            "is-protected",
+            !allowed
+        );
+
+
+        downloadButton.href =
+            allowed
+                ? downloadUrl(
+                    current
+                  )
+                : "#";
+
+
+        downloadButton.innerHTML =
+            allowed
+                ? `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"/>
+                    </svg>
+                    <span>Descargar esta foto</span>
+                  `
+                : `
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M7 10V8a5 5 0 0 1 10 0v2M6 10h12v10H6z"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"/>
+                    </svg>
+                    <span>Solicitar esta foto al promotor</span>
+                  `;
+
+
+        if (
+            !allowed
+        ) {
+
+            downloadButton.onclick =
+                event => {
+
+                    event.preventDefault();
+
+                    showProtectedDownloadMessage();
+                };
+        }
     }
 
 
@@ -3228,7 +3517,24 @@ async function init() {
                  *
                  * Sin límite de 10.
                  */
+                const protectedCount =
+                    filteredGalleryPhotos
+                        .filter(
+                            photo =>
+                                !isDownloadAllowed(
+                                    photo
+                                )
+                        )
+                        .length;
+
+
                 filteredGalleryPhotos
+                    .filter(
+                        photo =>
+                            isDownloadAllowed(
+                                photo
+                            )
+                    )
                     .forEach(
                         photo => {
 
@@ -3237,6 +3543,24 @@ async function init() {
                             );
                         }
                     );
+
+
+                if (
+                    protectedCount > 0
+                ) {
+
+                    setStatus(
+                        `${protectedCount} fotografía${
+                            protectedCount === 1
+                                ? ""
+                                : "s"
+                        } protegida${
+                            protectedCount === 1
+                                ? " requiere"
+                                : "s requieren"
+                        } solicitarse con el promotor.`
+                    );
+                }
 
 
                 updateSelectionUI();

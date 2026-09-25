@@ -649,3 +649,53 @@
             );
     }
 }
+
+/* ==========================================================
+   PROTECCIÓN DE FOTOGRAFÍAS CON MENORES
+   ========================================================== */
+
+.gallery-card.download-protected {
+    cursor: default;
+}
+
+.gallery-card.download-protected .select-photo {
+    display: none;
+}
+
+.gallery-card.download-protected::after {
+    content: "SOLICITAR AL PROMOTOR";
+
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    z-index: 6;
+
+    padding: 6px 8px;
+
+    border-radius: 9px;
+
+    background: rgba(32, 35, 31, .76);
+    color: #FFFFFF;
+
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .04em;
+
+    pointer-events: none;
+}
+
+.gallery-download.is-protected {
+    background: #F0EFEC !important;
+    color: #6E726C !important;
+    border-color: #DEDBD4;
+}
+
+.download-main-btn.is-protected {
+    background: #565B54 !important;
+    color: #FFFFFF !important;
+}
+
+.download-main-btn.is-protected:hover,
+.download-main-btn.is-protected:focus-visible {
+    background: #494E47 !important;
+}
