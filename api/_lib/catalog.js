@@ -108,16 +108,91 @@ function getPhoto(fotoId) {
    CARRUSEL
    ========================================================== */
 
+/*
+ * Orden revuelto del carrusel. Cada pantalla elige una semilla al abrirse y
+ * el servidor revuelve la lista siempre igual para esa semilla: así la foto N
+ * es la misma en cada consulta y ninguna se repite hasta que pasen todas.
+ * Sin semilla se usa el orden del catálogo.
+ */
+const shuffledBySeed =
+  new Map();
+
+function shuffledCarousel(
+  carousel,
+  rawSeed
+) {
+
+  const seed =
+    Number.parseInt(
+      rawSeed,
+      10
+    );
+
+  if (
+    !Number.isSafeInteger(seed) ||
+    seed <= 0
+  ) {
+
+    return carousel;
+  }
+
+  if (
+    shuffledBySeed.has(seed)
+  ) {
+
+    return shuffledBySeed.get(seed);
+  }
+
+  // mulberry32: generador pequeño y repetible a partir de la semilla.
+  let state =
+    seed >>> 0;
+
+  const random = () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  // Fisher-Yates.
+  const order =
+    carousel.slice();
+
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+
+  // Pocas pantallas a la vez: se guardan solo las semillas recientes.
+  if (shuffledBySeed.size >= 20) {
+    shuffledBySeed.delete(
+      shuffledBySeed.keys().next().value
+    );
+  }
+
+  shuffledBySeed.set(seed, order);
+
+  return order;
+}
+
 function getCarouselWindow(
-  rawIndex
+  rawIndex,
+  rawSeed
 ) {
 
   const data =
     loadCatalog();
 
+  const carousel =
+    shuffledCarousel(
+      data.carousel,
+      rawSeed
+    );
+
 
   const total =
-    data.carousel.length;
+    carousel.length;
 
 
   if (!total) {
@@ -172,7 +247,7 @@ function getCarouselWindow(
     prev:
 
       data.photos[
-        data.carousel[
+        carousel[
           (
             index -
             1 +
@@ -187,7 +262,7 @@ function getCarouselWindow(
     current:
 
       data.photos[
-        data.carousel[
+        carousel[
           index
         ]
       ],
@@ -196,7 +271,7 @@ function getCarouselWindow(
     next:
 
       data.photos[
-        data.carousel[
+        carousel[
           (
             index +
             1

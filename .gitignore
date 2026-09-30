@@ -10,3 +10,9 @@ node_modules/
 # Respaldos locales que genera 06_APLICAR_REVISION_MENORES.
 # OJO: data/revision_menores.csv SI se sube; Vercel lo usa al compilar.
 data/catalogo_carrusel_antes_menores_*.csv
+
+# Modelos de rostros/edad: el clasificador los descarga y verifica solo.
+models/
+
+# Lotes de fotos originales (se suben a Drive con scripts/importar-nuevas.mjs).
+imagenes_nuevas/

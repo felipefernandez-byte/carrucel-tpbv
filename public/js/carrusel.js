@@ -49,6 +49,15 @@ const els = {
   qrImage:
     $("qrImage"),
 
+  qrCard:
+    $("qrCard"),
+
+  qrTitle:
+    $("qrTitle"),
+
+  qrText:
+    $("qrText"),
+
   photoId:
     $("photoId"),
 
@@ -382,6 +391,17 @@ function showFeedback(
    CONSULTAR VENTANA DEL CARRUSEL
    ========================================================== */
 
+/*
+ * Semilla del orden revuelto: cambia cada vez que se abre el carrusel.
+ * El servidor revuelve todas las fotos con ella, así que el recorrido es
+ * al azar y ninguna se repite hasta que hayan pasado todas.
+ */
+const ORDEN_CARRUSEL =
+  1 + randomIndex(
+    2147483646
+  );
+
+
 async function fetchWindow(
   index
 ) {
@@ -389,7 +409,7 @@ async function fetchWindow(
   const response =
     await fetch(
 
-      `/api/data?action=carrusel-window&index=${encodeURIComponent(index)}`,
+      `/api/data?action=carrusel-window&index=${encodeURIComponent(index)}&orden=${ORDEN_CARRUSEL}`,
 
       {
         cache:
@@ -624,9 +644,69 @@ function renderWindow(
      QR
      ======================================================== */
 
-  els.qrImage.src =
+  /*
+   * Fotos con menores: se muestran con las caras difuminadas,
+   * pero sin QR (no se pueden descargar).
+   */
+  const protegida =
+    String(
+      current.permitir_descarga
+      ||
+      ""
+    )
+      .trim()
+      .toUpperCase() ===
+    "NO";
 
-    `${qrUrl(current)}&v=${Date.now()}`;
+
+  els.qrCard
+    ?.classList
+    .toggle(
+      "qr-protected",
+      protegida
+    );
+
+
+  if (
+    els.qrTitle
+  ) {
+
+    els.qrTitle.textContent =
+      protegida
+        ?
+        "Foto protegida"
+        :
+        "Escanea el QR";
+  }
+
+
+  if (
+    els.qrText
+  ) {
+
+    els.qrText.textContent =
+      protegida
+        ?
+        "Solicítala a tu promotor."
+        :
+        "Guarda esta foto o explora más imágenes de TPBV.";
+  }
+
+
+  if (
+    protegida
+  ) {
+
+    els.qrImage.removeAttribute(
+      "src"
+    );
+
+  } else {
+
+    els.qrImage.src =
+
+      `${qrUrl(current)}&v=${Date.now()}`;
+  }
 
 
   /* ========================================================
@@ -1148,10 +1228,37 @@ document
      * elegimos una posición inicial aleatoria.
      */
 
-    const initialIndex =
-      randomIndex(
-        firstData.total
+    /*
+     * ?inicio=N permite abrir el carrusel en una posición
+     * concreta (útil para revisar una foto en particular).
+     */
+    const requestedIndex =
+      Number(
+        new URLSearchParams(
+          location.search
+        )
+          .get(
+            "inicio"
+          )
       );
+
+
+    const initialIndex =
+      Number.isInteger(
+        requestedIndex
+      ) &&
+      requestedIndex > 0
+
+        ?
+
+        requestedIndex %
+        firstData.total
+
+        :
+
+        randomIndex(
+          firstData.total
+        );
 
 
     /*

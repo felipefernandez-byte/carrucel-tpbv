@@ -111,7 +111,8 @@ async function handler(
 
             const win =
               getCarouselWindow(
-                req.query.index
+                req.query.index,
+                req.query.orden
               );
 
 

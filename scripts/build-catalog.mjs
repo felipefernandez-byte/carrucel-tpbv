@@ -1,15 +1,16 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
-const { hasFaceBoxes } = require("../api/_lib/blur.js");
 
 const ROOT = process.cwd();
 const INPUT = path.join(ROOT, "data", "catalogo_carrusel.csv");
-const OUTPUT_DIR = path.join(ROOT, "generated");
+const EXTRA = path.join(ROOT, "data", "catalogo_nuevas.csv");
+const OUTPUT_DIR =path.join(ROOT, "generated");
 const OUTPUT = path.join(OUTPUT_DIR, "catalog.min.json");
 const REVIEW = path.join(ROOT, "data", "revision_menores.csv");
+
+// Segundos que dura cada foto en el carrusel, igual para todas. Manda sobre la
+// columna del CSV (que viene en 10) para que no se pierda al cargar un catálogo nuevo.
+const DURACION_CARRUSEL_SEGUNDOS = "8";
 
 function parseCsv(text) {
   const rows = [];
@@ -88,6 +89,18 @@ if (matrix.length < 2) {
 
 const headers = matrix[0].map(h => h.trim());
 
+// Lotes por evento (scripts/importar-nuevas.mjs) viven en su propio archivo
+// para que sobrevivan cuando se carga un catálogo principal nuevo.
+if (fs.existsSync(EXTRA)) {
+  const extra = parseCsv(fs.readFileSync(EXTRA, "utf8").replace(/^﻿/, ""));
+  const extraHeaders = (extra[0] || []).map(h => h.trim());
+  extraHeaders.forEach(h => { if (!headers.includes(h)) headers.push(h); });
+  for (const values of extra.slice(1)) {
+    const byName = new Map(extraHeaders.map((h, i) => [h, values[i] ?? ""]));
+    matrix.push(headers.map(h => byName.get(h) ?? ""));
+  }
+}
+
 const required = [
   "foto_id",
   "drive_file_id",
@@ -133,7 +146,11 @@ function reviewFields(row, fotoId) {
   const r = reviewById.get(fotoId);
 
   if (r) {
-    const clasificacion = String(r.clasificacion || "").trim().toUpperCase();
+    // Solo cuenta como definitiva la decisión de una persona (MANUAL). Lo que
+    // dijo el detector automático queda como pendiente: bloqueado y difuminado.
+    const manual = r.fuente_revision === "MANUAL";
+    const raw = String(r.clasificacion || "").trim().toUpperCase();
+    const clasificacion = manual ? raw : "REVISAR";
     const definitiva = clasificacion === "SIN_MENORES" || clasificacion === "CON_MENORES";
     reviewCounts[definitiva ? clasificacion : "PENDIENTE"]++;
     return {
@@ -175,6 +192,7 @@ const localities = {};
 const municipalities = {};
 const events = {};
 const carousel = [];
+let descartadas = 0;
 
 for (let i = 1; i < matrix.length; i++) {
   const values = matrix[i];
@@ -189,6 +207,15 @@ for (let i = 1; i < matrix.length; i++) {
   const driveId = String(row.drive_file_id || "").trim();
 
   if (!fotoId || !driveId) continue;
+
+  // "No mostrar": la persona la descartó. No entra al sitio (ni carrusel, ni
+  // galerías, ni /foto/ID); el original en Drive queda intacto.
+  const review = reviewById.get(fotoId);
+  if (review?.fuente_revision === "MANUAL" &&
+      String(review.clasificacion || "").trim().toUpperCase() === "DESCARTADA") {
+    descartadas++;
+    continue;
+  }
 
   const compact = {
     foto_id: fotoId,
@@ -208,7 +235,7 @@ for (let i = 1; i < matrix.length; i++) {
     usuario_origen: row.usuario_origen || "",
     registro_softr_id: row.registro_softr_id || "",
     campo_evidencia: row.campo_evidencia || "",
-    duracion_carrusel_segundos: row.duracion_carrusel_segundos || "10",
+    duracion_carrusel_segundos: DURACION_CARRUSEL_SEGUNDOS,
     mostrar_carrusel: row.mostrar_carrusel || "",
 
     // Evento (opcional). Los lotes nuevos llegan por municipio y evento;
@@ -230,13 +257,15 @@ for (let i = 1; i < matrix.length; i++) {
     continue;
   }
 
-  // Una foto protegida sin rostros ubicados se sirve difuminada completa:
-  // sigue en galerías (con candado) pero no se proyecta en el carrusel.
-  const fullyBlurred =
-    String(compact.permitir_descarga).trim().toUpperCase() === "NO" &&
-    !hasFaceBoxes(compact.caras);
+  // Con la protección activa, en el carrusel (proyector) solo aparecen las
+  // fotos que una persona ya revisó: sin menores (normales, con QR) y con
+  // menores (caras difuminadas, sin QR). Las pendientes no se proyectan.
+  const approvedForCarousel = protectionActive
+    ? compact.fuente_revision_menores === "MANUAL" &&
+      (compact.revision_menores === "SIN_MENORES" || compact.revision_menores === "CON_MENORES")
+    : true;
 
-  if (!fullyBlurred) {
+  if (approvedForCarousel) {
     carousel.push(index);
   }
 
@@ -296,6 +325,7 @@ if (protectionActive) {
   console.log(`  Descargables:          ${reviewCounts.SIN_MENORES.toLocaleString("es-MX")}`);
   console.log(`  Con menores:           ${reviewCounts.CON_MENORES.toLocaleString("es-MX")}`);
   console.log(`  Pendientes (bloq.):    ${reviewCounts.PENDIENTE.toLocaleString("es-MX")}`);
+  console.log(`  No mostrar (fuera):    ${descartadas.toLocaleString("es-MX")}`);
 } else {
   console.log("Protección de menores:   sin data/revision_menores.csv (todas descargables)");
 }
