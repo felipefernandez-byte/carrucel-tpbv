@@ -1304,11 +1304,11 @@ document
 
     els.municipio.textContent =
 
-      "No se pudo iniciar el carrusel";
+      "No se pudieron cargar las fotografías";
 
 
     els.usuarioOrigen.textContent =
 
-      "Revisa el catálogo y las variables de Google Drive.";
+      "Recarga la página en unos momentos.";
   }
 })();
