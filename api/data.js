@@ -4,7 +4,9 @@ const {
 
   getCarouselWindow,
 
-  getPhotosBy
+  getPhotosBy,
+
+  publicPhoto
 
 } =
   require(
@@ -81,7 +83,9 @@ async function handler(
         )
 
         .json(
-          photo
+          publicPhoto(
+            photo
+          )
         );
     }
 
@@ -103,9 +107,35 @@ async function handler(
 
         .json(
 
-          getCarouselWindow(
-            req.query.index
-          )
+          (() => {
+
+            const win =
+              getCarouselWindow(
+                req.query.index,
+                req.query.orden
+              );
+
+
+            return {
+
+              ...win,
+
+              prev:
+                publicPhoto(
+                  win.prev
+                ),
+
+              current:
+                publicPhoto(
+                  win.current
+                ),
+
+              next:
+                publicPhoto(
+                  win.next
+                )
+            };
+          })()
         );
     }
 
@@ -127,7 +157,15 @@ async function handler(
 
         .json(
 
-          getPhotosBy({
+          (result => ({
+
+            ...result,
+
+            items:
+              result.items.map(
+                publicPhoto
+              )
+          }))(getPhotosBy({
 
             localidad:
 
@@ -139,6 +177,11 @@ async function handler(
               req.query.municipio,
 
 
+            evento:
+
+              req.query.evento,
+
+
             limit:
 
               req.query.limit,
@@ -147,7 +190,7 @@ async function handler(
             offset:
 
               req.query.offset
-          })
+          }))
         );
     }
 

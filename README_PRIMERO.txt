@@ -9,7 +9,7 @@ Ahora Vercel publica LAS DOS PARTES:
     -> Carrusel para la pantalla/proyector.
     -> Animación 3D basada en la referencia de Stitch.
     -> Flechas.
-    -> Avance cada 10 segundos.
+    -> Avance cada 8 segundos (scripts/build-catalog.mjs).
     -> Clic en foto central = pausar/continuar.
     -> QR dinámico de la foto actual.
 

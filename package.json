@@ -1,16 +1,23 @@
 {
   "name": "tpbv-vercel-unificado",
-  "version": "5.0.0",
+  "version": "5.4.0",
   "private": true,
   "description": "Carrusel TPBV + pagina QR movil en un solo proyecto Vercel",
   "scripts": {
     "build": "node scripts/build-catalog.mjs",
-    "prepare-catalog": "node scripts/build-catalog.mjs"
+    "prepare-catalog": "node scripts/build-catalog.mjs",
+    "clasificar-menores": "node scripts/clasificar-menores.mjs",
+    "revisar-menores": "node scripts/revisar-menores.mjs",
+    "aplicar-menores": "node scripts/aplicar-revision-menores.mjs"
   },
- "engines": {
-  "node": "22.x"
-},
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "onnxruntime-node": "^1.30.0"
   }
 }

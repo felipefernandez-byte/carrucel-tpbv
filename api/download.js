@@ -338,6 +338,44 @@ async function handler(
 
 
     /* ======================================================
+       PROTECCIÓN DE DESCARGA
+       ====================================================== */
+
+    /*
+     * El bloqueo se valida también en el servidor.
+     * Así no basta con escribir manualmente /api/download?...
+     * para saltarse la protección de la interfaz.
+     *
+     * Compatibilidad: si el catálogo todavía no tiene la columna
+     * permitir_descarga, se conserva el comportamiento anterior.
+     */
+    const permitirDescarga =
+      String(
+        photo.permitir_descarga ||
+        ""
+      )
+        .trim()
+        .toUpperCase();
+
+
+    if (
+      permitirDescarga ===
+      "NO"
+    ) {
+
+      return res
+        .status(403)
+        .json({
+          code:
+            "DESCARGA_PROTEGIDA",
+
+          error:
+            "Esta fotografía no está disponible para descarga directa. Si deseas obtenerla, solicítala con tu promotor."
+        });
+    }
+
+
+    /* ======================================================
        METADATOS
        ====================================================== */
 
